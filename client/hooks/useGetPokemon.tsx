@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "react-query";
 import { useSharedValue } from "react-native-reanimated";
-import { getPokemonStats } from "../utils/pokemonStats";
-import { getPokemonByIdQuery, Pokemon } from "../repositories/pokemonRepository";
+import { getPokemonByIdQuery } from "../repositories/pokemonRepository";
+import { Pokemon } from "../types/types";
 
 export const useGetPokemon = (pokemonId: number) => {
     const { data: pokemon, isSuccess } = useQuery(["pokemon", pokemonId], getPokemonByIdQuery)

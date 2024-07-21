@@ -1,17 +1,27 @@
 import { interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { generateRandom } from "../utils/utils"
+import { Pokemon } from "../types/types"
 
-export const useEnemyAttackAnimation = (pokemon1, pokemon2, updateText, health1) => {
+export const useEnemyAttackAnimation = (currentPokemon: Pokemon, enemyPokemon: Pokemon, updateText
+    : (text: string) => void, health1, checkAllFainted) => {
+
     const enemyAttack = () => {
-        const powerMoves = pokemon2.moves.filter(e => e.power > 1)
+        const powerMoves = enemyPokemon.moves.filter(e => e.power > 1)
         const move = powerMoves[generateRandom(powerMoves.length)]
 
-        updateText(pokemon2.name + " used " + move.name)
+        updateText(enemyPokemon.name + " used " + move.name)
 
-        const damage = ((((2 * 1) / 5) + 2) * move.power * pokemon2.attack / pokemon1.defence) / 50 + 2
+        const damage = ((((2 * 1) / 5) + 2) * move.power * enemyPokemon.attack / currentPokemon.defence) / 50 + 2 * 10
         health1.value = Math.round(health1.value - damage);
-
         setTimeout(enemyAttackAnimation, 1000)
+        setTimeout(() => {
+            if (checkAllFainted(health1.value)) {
+                return
+            }
+            else { setTimeout(() => updateText("What will you do?"), 2000) }
+
+        }, 3000)
+
     }
 
     const enemyPokemonAnimation = useSharedValue(0)
@@ -52,7 +62,7 @@ export const useEnemyAttackAnimation = (pokemon1, pokemon2, updateText, health1)
     })
 
     const startEnemyHpAnimation = () => {
-        const value = 1 - (health1.value / pokemon1?.hp)
+        const value = 1 - (health1.value / currentPokemon?.hp)
         widthAnimation.value = withTiming(value, { duration: 2000 })
     }
 

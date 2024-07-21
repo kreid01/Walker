@@ -1,12 +1,12 @@
 import { TouchableOpacity, View } from "react-native"
 import { MyText } from "../utils/MyText"
-import { IPokemonMove, Pokemon } from "../../repositories/pokemonRepository";
+import { IPokemonMove, Pokemon, TeamPokemon } from "../../repositories/pokemonRepository";
 import { useState } from "react";
 import { capitalizeFirstLetter } from "../../utils/utils";
 
 interface LearnMoveProps {
     setMove: any;
-    pokemon: Pokemon
+    pokemon: TeamPokemon
     move: IPokemonMove
     setPokemon: any
     updateText: (text: string) => void
@@ -47,7 +47,7 @@ export const LearnMove: React.FC<LearnMoveProps> = ({ setMove, pokemon, move, se
                 </>
             }
             {forgetAMove &&
-                <View className="flex flex-row mx-4 -mt-4">
+                <View className="flex flex-row mx-4 ">
                     <View>
                         <MyText style="text-white text-xl">New Move</MyText>
                         <View className="border-[1px] border-white px-1 mt-3 rounded-sm">

@@ -1,13 +1,7 @@
 import axios from "axios"
 import { PokemonClient } from "pokenode-ts"
-import { getStoredPokedex, getValueFor, savePokedex } from "../utils/secureStorage"
 
 export const getPokedex = async () => {
-    const storedPokedex = await getStoredPokedex()
-    if (storedPokedex.length > 1) {
-        return getStoredPokedex()
-    }
-
     //const limit = pageParam* 100
     const api = new PokemonClient()
     // const {data} = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=${limit - 100}`)
@@ -20,6 +14,5 @@ export const getPokedex = async () => {
     }
     ))
 
-    savePokedex(pokemon)
     return pokemon
 }

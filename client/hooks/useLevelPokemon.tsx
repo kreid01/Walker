@@ -1,4 +1,4 @@
-import { Pokemon } from "../repositories/pokemonRepository";
+import { Pokemon } from "../types/types";
 import { generateRandom } from "../utils/utils";
 
 export const levelPokemon = (pokemon: Pokemon) => {

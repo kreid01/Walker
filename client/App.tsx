@@ -10,34 +10,36 @@ import { StatusBar } from "react-native";
 import { Provider, useCreateStore } from 'tinybase/ui-react';
 import { createStore } from "tinybase/store";
 import { useFonts } from "./hooks/useFonts";
+import { HomeScreen } from "./screens/Home";
+import { PokemonScreen } from "./screens/PokemonScreen";
 
-   export const store = createStore()
-      .setTablesSchema({
-        pokemon: {
-        name: {type: "string"},
-        image: {type: "string"}
-        }
-      })
+export const store = createStore()
+  .setTablesSchema({
+    pokemon: {
+      name: { type: "string" },
+      image: { type: "string" }
+    }
+  })
 
 
 export default function App() {
   const queryClient = new QueryClient()
-  
+
   const LoadFonts = async () => {
     await useFonts();
   };
-  
 
-LoadFonts();
+
+  LoadFonts();
 
   return (
     <Provider store={store}>
-    <QueryClientProvider client={queryClient}>
-      <StatusBar barStyle="light-content" translucent />
-      <NavigationContainer>
-        <MyTabs />
-      </NavigationContainer>
-    </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <StatusBar barStyle="light-content" translucent />
+        <NavigationContainer>
+          <MyTabs />
+        </NavigationContainer>
+      </QueryClientProvider>
     </Provider>
   );
 }
@@ -50,12 +52,22 @@ function MyTabs() {
       screenOptions={{
         tabBarStyle: { display: "none" },
       }}
-      initialRouteName="Fight"
+      initialRouteName="Home"
     >
+      <Tab.Screen
+        name="Home"
+        options={{ headerShown: false }}
+        component={HomeScreen}
+      />
       <Tab.Screen
         name="Inventory"
         options={{ headerShown: false }}
         component={Inventory}
+      />
+      <Tab.Screen
+        name="Pokemon"
+        options={{ headerShown: false }}
+        component={PokemonScreen}
       />
       <Tab.Screen
         name="Fight"

@@ -1,9 +1,9 @@
 import { interpolate, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated"
-import { IPokemonMove } from "../repositories/pokemonRepository"
 import { generateRandom } from "../utils/utils"
 import { useEffect, useState } from "react"
 import { getPokemonStats } from "../utils/pokemonStats"
 import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors"
+import { IPokemonMove } from "../types/types"
 
 export const useAttackAnimation = (pokemon1, pokemon2, updateText, setPokemon, health2, setCurrentPokemon) => {
     const attack = (move: IPokemonMove) => {

@@ -1,12 +1,17 @@
-import React, { useState } from "react";
-import { IPokemonMove, Pokemon, TeamPokemon } from "../../repositories/pokemonRepository";
-import { TouchableOpacity, View, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { getTeamByIds, TeamPokemon } from "../../repositories/pokemonRepository";
+import { TouchableOpacity, View } from "react-native";
 import { FightUI } from "./FightUI";
-import TypingText from 'react-native-typing-text';
 import { BattleButton } from "../utils/BattleButton";
 import Typing from "../text/Typing";
 import { MyText } from "../utils/MyText";
 import { ShopUI } from "./ShopUI";
+import { useQuery } from "react-query";
+import { IPokemonMove, Pokemon } from "../../types/types";
+import { BagUI } from "./BagUI";
+import { RunUI } from "./RunUI";
+import { PokemonUI } from "./PokemonUI";
+import Animated from "react-native-reanimated";
 
 interface BattleUIProps {
     pokemon: Pokemon
@@ -14,22 +19,26 @@ interface BattleUIProps {
     text: string;
     resettingText: boolean
     lockUI: boolean
-    team: TeamPokemon[]
-    changePokemon: (pokemon: TeamPokemon) => void
+    changePokemon: (pokemon: number) => void
     setCurrentPokemon: any
     coins: number
     updateText: (text: string) => void
+    navigation: any
+    team: Pokemon[]
+    setTeam: any
+    setTeamIds: any
+    health: any
 }
 
 
-export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updateText,
-    resettingText, lockUI, team, changePokemon, coins, setCurrentPokemon }) => {
+export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updateText, team, setTeam, setTeamIds,
+    resettingText, lockUI, changePokemon, coins, setCurrentPokemon, navigation, health }) => {
+    const [itemIds, setItemIds] = useState([])
     const [selectedMenu, setSelectedMenu] = useState(null)
-    console.log(selectedMenu)
 
     return (
-        <View className="w-[100%] fixed  top-8  bg-slate-500 -mt-24  border-2 border-yellow-500 h-[52%] py-2" pointerEvents={lockUI ? "none" : "auto"}>
-            <View className="bg-white w-[95%] mt-2 h-16 border-yellow-300 border-2 rounded-md mr-1 ml-2">
+        <View className="w-[100%] fixed  top-8  bg-slate-500 -mt-24  border-2 border-yellow-500 h-[39.5%] py-2" pointerEvents={lockUI ? "none" : "auto"}>
+            <View className="bg-white w-[95%]  h-16 border-yellow-300 border-2 rounded-md mr-1 ml-2">
                 {!resettingText && <Typing color={"black"} textSize={22} text={text} />}
             </View>
             {selectedMenu == null &&
@@ -37,56 +46,37 @@ export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updat
                     <BattleButton setSelectedMenu={setSelectedMenu} text="FIGHT" colour={"bg-red-500"} />
                     <BattleButton setSelectedMenu={setSelectedMenu} text="POKeMON" colour="bg-green-500" />
                     <BattleButton setSelectedMenu={setSelectedMenu} text="BAG" colour="bg-yellow-500" />
-                    <BattleButton setSelectedMenu={setSelectedMenu} text="RUN" colour="bg-blue-500" />
                     <BattleButton setSelectedMenu={setSelectedMenu} text="SHOP" colour="bg-purple-500" />
+                    <BattleButton setSelectedMenu={setSelectedMenu} text="RUN" colour="bg-blue-500" />
                 </View>}
             {selectedMenu == "fight" && <FightUI
                 setSelectedMenu={setSelectedMenu}
                 pokemon={pokemon}
                 attack={attack} />}
             {selectedMenu == "pokemon" && <PokemonUI
+                health={health}
+                pokemon={pokemon}
                 changePokemon={changePokemon}
                 team={team}
                 setSelectedMenu={setSelectedMenu} />}
+            {selectedMenu == "bag" && <BagUI teamPokemon={team} itemIds={itemIds} />}
             {selectedMenu == "shop" && <ShopUI
+                setTeamIds={setTeamIds}
                 pokemon={pokemon}
+                setTeam={setTeam}
                 updateText={updateText}
+                setMyItemIds={setItemIds}
                 setCurrentPokemon={setCurrentPokemon}
                 team={team}
                 coins={coins} />}
-            {selectedMenu != null &&
-                <TouchableOpacity onPress={() => setSelectedMenu(null)}
-                    className="border-[1px] mt-auto ml-3 my-2 mx-auto  border-white w-14 rounded-sm">
-                    <MyText style="px-2 mx-auto text-white text-xl">{"Back"}</MyText>
-                </TouchableOpacity>}
-        </View>
-    )
-}
-
-interface PokemonUIProps {
-    changePokemon: (pokemon: TeamPokemon) => void;
-    team: TeamPokemon[]
-    setSelectedMenu: React.Dispatch<any>
-}
-
-export const PokemonUI: React.FC<PokemonUIProps> = ({ team, changePokemon, setSelectedMenu }) => {
-    return (
-        <View className="flex flex-row flex-wrap mx-2">
-            {team.map((p) => {
-                return (
-                    <TouchableOpacity onPress={() => {
-                        changePokemon(p)
-                        setSelectedMenu(null)
-                    }} className="w-[47%] border-white border-[1px] flex flex-row rounded-sm m-1">
-                        <View className="w-[50%]">
-                            <MyText style="text-white ml-1 -mt-1 text-xl">{p.name}</MyText>
-                            <View className="w-[100%] rounded-md ml-1 bg-green-500 h-2"></View>
-                        </View>
-                        <MyText style="text-white ml-2 mt-5">20/20</MyText>
-                        <Image className="ml-auto h-10 w-10 object-fit" source={{ uri: p.front }} />
+            {selectedMenu == "run" && <RunUI navigation={navigation} setSelectedMenu={setSelectedMenu} />}
+            {(selectedMenu != null || selectedMenu == "run") &&
+                <View className="mt-auto relative w-14 z-10">
+                    <TouchableOpacity onPress={() => setSelectedMenu(null)}
+                        className="border-[1px] ml-2 r -mb-1 border-white w-14 rounded-sm">
+                        <MyText style="px-2 mx-auto text-white text-xl">{"Back"}</MyText>
                     </TouchableOpacity>
-                )
-            })}
+                </View>}
         </View>
     )
 }

@@ -10,6 +10,8 @@ export default class TypingText extends Component {
 
         this.typing_timer = -1;
 
+        this.animatedText = React.createRef(null)
+
         this.blinking_cursor_timer = -1;
 
         this.state = { text: '', blinking_cursor_color: 'transparent' }
@@ -36,7 +38,7 @@ export default class TypingText extends Component {
         this.typing_timer = -1;
 
         if (this.index < this.props.text.length) {
-            if (this.refs.animatedText) {
+            if (this.animatedText) {
                 this.setState({ text: this.state.text + this.props.text.charAt(this.index) }, () => {
                     this.index++;
 
@@ -62,7 +64,7 @@ export default class TypingText extends Component {
     render() {
         return (
             <View>
-                <Text ref="animatedText" style={{ fontFamily: "vt", color: this.props.color, fontSize: this.props.textSize, textAlign: 'center' }}>{this.state.text}
+                <Text ref={this.animatedText} style={{ fontFamily: "vt", color: this.props.color, fontSize: this.props.textSize, textAlign: 'center' }}>{this.state.text}
                     <Text style={{ fontFamily: "vt", color: this.state.blinking_cursor_color }}>|</Text>
                 </Text>
             </View>
@@ -84,6 +86,6 @@ TypingText.defaultProps =
     text: "Default Typing Animated Text.",
     color: "rgb( 77, 192, 103 )",
     textSize: 30,
-    typingAnimationDuration: 50,
-    blinkingCursorAnimationDuration: 190
+    typingAnimationDuration: 40,
+    blinkingCursorAnimationDuration: 150
 }

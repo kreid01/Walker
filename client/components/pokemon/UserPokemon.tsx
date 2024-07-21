@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react"
 import { View, Text, Image } from "react-native"
-import Animated, { FadeInUp, SharedValue, SlideInRight, SlideInUp } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutDown, SharedValue, SlideInRight, SlideInUp } from "react-native-reanimated";
 import { AnimatedText } from "../utils/AnimatedText";
-import { Pokemon } from "../../repositories/pokemonRepository";
 import hud from "../../sprites/hud/pokemon.png"
 import { MyText } from "../utils/MyText";
+import { Pokemon } from "../../types/types";
 
 interface UserPokemonProps {
   pokemon1: Pokemon;
@@ -14,10 +14,11 @@ interface UserPokemonProps {
   healthWidth: {
     width: number;
   }
+  fainted: boolean
 }
 
 
-export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1,
+export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted,
   widthAnimation, pokemonAttack, healthWidth, flash }) => {
   const xpNeeded = pokemon1?.growthRate?.filter(e => e.level == pokemon1.level)[0].experience
   const [xpBar, setXpBar] = useState((pokemon1?.xp / xpNeeded) * 118)
@@ -31,10 +32,7 @@ export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1,
               pokemon1.height <= 3 ? pokemon1.height / 7 :
                 pokemon1.height / 9
 
-  const top = 80
-
-  console.log(pokemon1.height, scale)
-
+  const top = 90
 
   useEffect(() => {
     setXpBar(((pokemon1?.xp / xpNeeded)) * 118)
@@ -55,14 +53,16 @@ export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1,
         </View>
         <MyText style="absolute left-[330px] text-white z-40 top-[15px]">{pokemon1?.hp}</MyText>
       </Animated.View>
-      <Animated.View entering={FadeInUp} className={"absolute left-0 bottom-[105px]"} style={[pokemonAttack, flash]}>
-        <Animated.Image style={[{
-          transform: [{ scale: scale }],
-          top: top, aspectRatio: 1,
-          height: undefined, width: 180,
-          objectFit: 'contain'
-        }]} source={{ uri: uri }} />
-      </Animated.View>
+      {!fainted && <Animated.View exiting={FadeOutDown} entering={FadeInUp}>
+        <Animated.View className={"absolute left-0  top-14"} style={[pokemonAttack, flash]}>
+          <Animated.Image style={[{
+            transform: [{ scale: scale }],
+            top: top, aspectRatio: 1,
+            height: undefined, width: 180,
+            objectFit: 'contain'
+          }]} source={{ uri: uri }} />
+        </Animated.View>
+      </Animated.View>}
     </>
   )
 }

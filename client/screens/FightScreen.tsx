@@ -1,24 +1,42 @@
+import { useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
-import { ImageBackground, Text, View } from "react-native";
-import { withTiming } from "react-native-reanimated";
+import { View, Image } from "react-native";
+import Animated, { FadeOut, interpolate, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { BattleUI } from "../components/battle/BattleUI";
-import { Navigation } from "../components/nav/Navigation";
-import { EnemyPokemon } from "../components/pokemon/EnemyPokemon";
-import { UserPokemon } from "../components/pokemon/UserPokemon";
+import { BattleGround } from "../components/battle/Battlground";
 import { useAttackAnimation } from "../hooks/useAttackAnimation";
 import { useEnemyAttackAnimation } from "../hooks/useEnemyAttackAnimation";
+import { IPokemonMove } from "../types/types";
+import { generateRandom } from "../utils/utils";
+import { BattleHeader } from "../components/battle/BattleHeader";
 import { useGetPokemon } from "../hooks/useGetPokemon";
-import { getRapidash, getTeamByIds, IPokemonMove, TeamPokemon } from '../repositories/pokemonRepository';
-import { capitalizeFirstLetter, generateRandom } from "../utils/utils";
-import { ShopUI } from "../components/battle/ShopUI";
-import { useQuery } from "react-query";
-import { MyText } from "../components/utils/MyText";
+import { useGetTeam } from "../hooks/useGetTeam";
 
 
-export const FightScreen = ({ navigation }) => {
-  const [myPokemon, setMyPokemon] = useState(1)
-  const [pokemon, setPokemon] = useState(4)
-  const [teamIds, setTeamIds] = useState([1, 77, 92, 172, 3, 6])
+export const FightScreen = ({ navigation, route }) => {
+  const { starterPokemonId } = route.params
+  const [starterPokemon, setStarterPokemon] = useState(starterPokemonId)
+
+  const [pokemon, setPokemon] = useState<number>(generateRandom())
+  const isFocused = useIsFocused();
+  const [focused, setIsFocused] = useState(true)
+
+
+  useEffect(() => {
+    if (!isFocused) {
+      setPokemon(generateRandom(1000))
+      userWidthAnimation.value = withTiming(0, { duration: 50 })
+
+      setCoins(0)
+      setRound(0)
+      setStarterPokemon(route.params)
+
+      setIsFocused(false)
+    } else {
+      setIsFocused(true)
+    }
+  }, [isFocused])
+
 
   const [text, setText] = useState("")
   const [round, setRound] = useState(0)
@@ -26,14 +44,17 @@ export const FightScreen = ({ navigation }) => {
 
   const [resettingText, setResettingText] = useState(false)
   const [lockUI, setLockUI] = useState(false)
-
-  const { currentPokemon: userPokemon, isSuccess, health: userHealth, setCurrentPokemon } = useGetPokemon(myPokemon)
-  const { currentPokemon: enemyPokemon, isSuccess: isSuccess2, health: enemyHealth } = useGetPokemon(pokemon)
-  const { data: team } = useQuery(["team", teamIds], getTeamByIds)
-
-  console.log(team)
-
+  const [lost, setLost] = useState(false)
   const [fainted, setFainted] = useState(false)
+  const [userFainted, setUserFainted] = useState(false)
+  const [teamIds, setTeamIds] = useState([parseInt(starterPokemon)])
+
+  const [currentPokemonHealth, setCurrentPokemonHealth] = useState<number>()
+
+  const { currentPokemon: currentPokemon, health: userHealth, setCurrentPokemon, changePokemon,
+    team, setTeam
+  } = useGetTeam(teamIds, currentPokemonHealth)
+  const { currentPokemon: enemyPokemon, health: enemyHealth } = useGetPokemon(pokemon)
 
   const updateText = (text: string) => {
     setResettingText(true)
@@ -43,11 +64,19 @@ export const FightScreen = ({ navigation }) => {
     }, 100)
   }
 
+  const checkAllFainted = (currentPokemonHp: number) => {
+    const teamFainted = team.filter(e => e && e.id != currentPokemon.id).every(e => e.currentHp <= 0)
+    const currentPokemonFainted = currentPokemonHp <= 0
+    if (teamFainted && currentPokemonFainted) {
+      return true
+    }
+  }
+
   const { attack,
     pokemonAttack,
     width,
     widthAnimation,
-    enemyFlash } = useAttackAnimation(userPokemon,
+    enemyFlash } = useAttackAnimation(currentPokemon,
       enemyPokemon,
       updateText,
       setPokemon,
@@ -59,10 +88,21 @@ export const FightScreen = ({ navigation }) => {
     healthWidth,
     widthAnimation: userWidthAnimation,
     flash
-  } = useEnemyAttackAnimation(userPokemon,
+  } = useEnemyAttackAnimation(currentPokemon,
     enemyPokemon,
     updateText,
-    userHealth)
+    userHealth,
+    checkAllFainted)
+
+  useEffect(() => {
+    if (currentPokemon)
+      userWidthAnimation.value = withTiming(1 - (currentPokemon.currentHp / currentPokemon.hp), { duration: 50 })
+  }, [currentPokemon?.name])
+
+  useEffect(() => {
+    setCurrentPokemonHealth(userHealth.value)
+  }, [userHealth.value])
+
 
   useEffect(() => {
     if (enemyPokemon) {
@@ -82,71 +122,105 @@ export const FightScreen = ({ navigation }) => {
         updateText(enemyPokemon.name + " fainted")
         setCoins(prevState => prevState + generateRandom(10))
         setRound(prevState => prevState + 1)
+        levelUp()
         setFainted(true)
         setTimeout(() => {
           setPokemon(generateRandom())
           setFainted(false)
         }, 1000)
       } else {
-        enemyAttack()
-        setTimeout(() => updateText("What will you do?"), 2000)
+        startEnemyAttack()
       }
+    }, 3000)
+
+    setTimeout(() => {
+      if (!lost) setLockUI(false)
+    }, 7000)
+  }
+
+  const startEnemyAttack = () => {
+    enemyAttack()
+    setTimeout(() => {
+      if (userHealth.value <= 0 && !checkAllFainted(userHealth.value)) {
+        setTimeout(() => {
+          const id = (team.filter(e => e && e.id != currentPokemon.id && e.currentHp > 0)[0])
+          changePokemon(id.id)
+          setUserFainted(false)
+        }, 1000)
+      } else {
+        updateText(currentPokemon.name + " fainted")
+        setUserFainted(true)
+        setLost(true)
+        setLockUI(true)
+        setTimeout(() => updateText(`All your pokemon have fainted, you made it to round ${round}`), 2000)
+      }
+    }, 3000)
+  }
+
+
+  const levelUp = () => {
+    const value = (xpBar.value + (20))
+    xpBar.value = withTiming(value, { duration: 500 })
+  }
+
+  const xpBar = useSharedValue(0);
+  const xpBarAnimation = useAnimatedStyle((): any => {
+    return { width: interpolate(xpBar.value, [0, 99], [0, 99]) }
+  })
+
+  const changePokemonTurn = (id: number) => {
+    changePokemon(id)
+    setLockUI(true)
+    const pokemon = team.filter(e => e.id == id)[0].name
+    updateText("You sent out " + pokemon)
+    setTimeout(() => {
+      enemyAttack()
+      setTimeout(() => updateText("What will you do?"), 2000)
     }, 3000)
     setTimeout(() => setLockUI(false), 7000)
   }
 
-  const changePokemon = (pokemon: TeamPokemon) => {
-    setMyPokemon(pokemon.id)
-  }
-
+  const [showIntro, setShowIntro] = useState(true)
   useEffect(() => {
-    if (userPokemon) updateText("You send out " + capitalizeFirstLetter(userPokemon.name))
-  }, [userPokemon])
-
-
-  const [background, setBackground] = useState(require("../sprites/backgrounds/image-5.png"))
-
+    setShowIntro(true)
+    setTimeout(() => setShowIntro(false), 2500)
+  }, [focused])
 
   return (
-    <View className="h-[100vh] relative">
-      <View className=" flex flex-row bg-slate-500 pt-5 border-2 border-yellow-500">
-        <MyText style="text-xl  text-white mx-auto">Coins: {coins}</MyText>
-        <MyText style="text-xl text-white mx-auto">Round: {round}</MyText>
-      </View>
-      <ImageBackground className="absolute top-[7.7vh]" style={{ height: 270, width: "100%" }} source={background} />
-      <View className="relative z-5">
-        <View className=" h-[89vw]">
-          {isSuccess && userPokemon?.growthRate.length > 1 && userWidthAnimation &&
-            <UserPokemon
-              pokemon1={userPokemon}
-              pokemonAttack={pokemonAttack}
-              healthWidth={healthWidth}
-              widthAnimation={userWidthAnimation}
-              flash={flash}
-            />}
-          {isSuccess2 && enemyPokemon && widthAnimation &&
-            <EnemyPokemon width={width}
-              attack={enemyPokemonAttack}
-              pokemon2={enemyPokemon}
-              fainted={fainted}
-              flashAnimation={enemyFlash} />
-          }
-        </View>
-      </View>
-      <BattleUI
+    focused && <View className="h-[100vh] relative">
+      {showIntro && <Animated.Image exiting={FadeOut} source={gif} className="h-[268px] top-[135px] w-[375px] l z-20 absolute" />}
+      <BattleHeader coins={coins} round={round} xpBarAnimation={xpBarAnimation} />
+      <BattleGround
+        userFainted={userFainted}
+        currentPokemon={currentPokemon}
+        pokemonAttack={pokemonAttack}
+        healthWidth={healthWidth}
+        userWidthAnimation={userWidthAnimation}
+        fainted={fainted}
+        flash={flash}
+        enemyFlash={enemyFlash}
+        enemyPokemon={enemyPokemon}
+        enemyPokemonAttack={enemyPokemonAttack}
+        width={width}
+      />
+      {currentPokemon && <BattleUI
+        health={userHealth}
+        navigation={navigation}
         team={team}
-        changePokemon={changePokemon}
+        changePokemon={changePokemonTurn}
+        setTeam={setTeam}
+        setTeamIds={setTeamIds}
         lockUI={lockUI}
-        pokemon={userPokemon}
+        pokemon={currentPokemon}
+        setCurrentPokemon={setCurrentPokemon}
         attack={startAttack}
         text={text}
         coins={coins}
-        setCurrentPokemon={setCurrentPokemon}
         updateText={updateText}
-        resettingText={resettingText} />
-      <View className="hidden">
-        <Navigation navigation={navigation} />
-      </View>
+        resettingText={resettingText} />}
     </View >
   )
 }
+
+import gif from "../assets/intro.gif"
+import { UserPokemon } from "../components/pokemon/UserPokemon";

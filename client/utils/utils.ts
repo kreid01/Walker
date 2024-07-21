@@ -5,18 +5,23 @@ export const generateRandom = (maxLimit = 600) => {
 }
 
 export const capitalizeFirstLetter = (string: string) => {
+  if (string == null) return ""
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export const shuffle = (array) => {
-  let currentIndex = array.length;
-  while (currentIndex != 0) {
+export const shuffle = (arr) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
-    let randomIndex = Math.floor(Math.random() * currentIndex);
-    currentIndex--;
-    [array[currentIndex], array[randomIndex]] = [
-      array[randomIndex], array[currentIndex]];
+export const duplidateData = (data: any[]) => {
+  let newData = data;
+  for (let i = 0; i < 100; i++) {
+    if (newData?.length < 130) newData = [...newData, ...newData]
   }
 
-  return array
+  return shuffle(newData)
 }
