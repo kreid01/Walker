@@ -157,11 +157,16 @@ export const AnimatedDeckItem: React.FC<AnimatedDeckItemProps> = ({ pokemon, ind
               <Animated.View className="absolute scale-50 -right-[129px] -top-[180px]" style={image1Opacity as any}>
                 <View className="flex scale-50 flex-row">
                   <View className="top-56 w-36">
-                    <MyText style="text-center text-black text-4xl">{capitalizeFirstLetter(pokemon.name)}</MyText>
-                    <View>
-                      <View className={`border-2 w-14 ml-5 border-${getBackgroundColour(pokemon.type)}-500`}>
-                        <MyText style={`text-center text-black `}>{capitalizeFirstLetter(pokemon.type)}</MyText>
-                      </View>
+                    <MyText style="ml-4 text-black w-40 text-4xl">{capitalizeFirstLetter(pokemon.name)}</MyText>
+                    <View className="flex flex-row ml-2">
+                      {pokemon?.types.map(type => {
+                        if (!type) return
+                        return (
+                          <View key={type} className={`border-2 w-14 ml-5 mx-1 border-${getBackgroundColour(type)}-500`}>
+                            <MyText style={`text-center text-black `}>{capitalizeFirstLetter(type)}</MyText>
+                          </View>
+                        )
+                      })}
                     </View>
                   </View>
                   <Animated.Image source={{ uri: uri }} style={[{ objectFit: "contain" }, image1Opacity]}
@@ -177,7 +182,7 @@ export const AnimatedDeckItem: React.FC<AnimatedDeckItemProps> = ({ pokemon, ind
           {cardSelected &&
             <PokemonEntry name={pokemon?.name} />}
         </Reanimted.View>}
-    </Reanimted.View>
+    </Reanimted.View >
 
   )
 }
@@ -191,8 +196,8 @@ export const PokemonEntry: React.FC<PokemonEntryProps> = ({ name }) => {
 
   return (
     isSuccess &&
-    <Reanimted.View className="w-80 -ml-24 mt-14" entering={SlideInLeft.delay(900).duration(1000)}>
-      <MyText style="text-xl">{entry}</MyText>
+    <Reanimted.View className="w-80 -ml-24 mt-14" entering={SlideInLeft.delay(500).duration(1000)}>
+      <MyText style="text-xl text-white">{entry}</MyText>
     </Reanimted.View>
   )
 }

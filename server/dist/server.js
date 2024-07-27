@@ -7,128 +7,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-const pokenode_ts_1 = require("pokenode-ts");
-const fs = require("fs");
-const api = new pokenode_ts_1.PokemonClient();
-const getPokemon = () => __awaiter(this, void 0, void 0, function* () {
-    const pokemon = (yield api.listPokemons(0, 151)).results;
-    const data = yield Promise.all(pokemon.map((p) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield api.getPokemonByName(p.name);
-            const stats = response.stats;
-            return {
-                name: response.name,
-                id: response.id,
-                type: response.types,
-                front: response.sprites.front_default,
-                back: response.sprites.back_default,
-                baseAttack: stats[1].base_stat,
-                baseDefence: stats[2].base_stat,
-                baseSpecialAttack: stats[3].base_stat,
-                baseSpecialDefence: stats[4].base_stat,
-                baseSpeed: stats[5].base_stat,
-                height: response.height,
-                moves: response.moves,
-            };
-        }
-        catch (err) {
-            console.log(err);
-        }
-    })));
-    writeToFile(JSON.stringify(data), "pokemon.json");
-});
-const getPokemonSpecies = () => __awaiter(this, void 0, void 0, function* () {
-    const species = (yield api.listPokemonSpecies(0, 2000)).results;
-    const data = yield Promise.all((species).map((species) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield api.getPokemonSpeciesByName(species.name);
-            return {
-                id: response.id,
-                name: response.name,
-                generation: response.generation,
-                growthRate: response.growth_rate,
-                isMythical: response.is_mythical,
-                isLegendary: response.is_mythical,
-                isBaby: response.is_baby,
-                evolutionChain: response.evolution_chain,
-            };
-        }
-        catch (err) {
-            console.log(err);
-        }
-    })));
-    writeToFile(JSON.stringify(data), "species.json");
-});
-const getGrowthRates = () => __awaiter(this, void 0, void 0, function* () {
-    const species = (yield api.listGrowthRates(0, 2000)).results;
-    const data = yield Promise.all((species).map((species) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield api.getGrowthRateByName(species.name);
-            return {
-                name: response.name,
-                id: response.id,
-                levels: response.levels
-            };
-        }
-        catch (err) {
-            console.log(err);
-        }
-    })));
-    writeToFile(JSON.stringify(data), "growthRates.json");
-});
-const getMoves = () => __awaiter(this, void 0, void 0, function* () {
-    const moveApi = new pokenode_ts_1.MoveClient();
-    const species = (yield moveApi.listMoves(0, 10000)).results;
-    const data = yield Promise.all((species).map((species) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield moveApi.getMoveByName(species.name);
-            return {
-                name: response.name,
-                power: response.power,
-                pp: response.power,
-                accuracy: response.accuracy,
-                id: response.accuracy,
-                effectChange: response.effect_changes,
-                type: response.type,
-                statChanges: response.stat_changes,
-            };
-        }
-        catch (err) {
-            console.log(err);
-        }
-    })));
-    writeToFile(JSON.stringify(data), "moves.json");
-});
-const getItems = () => __awaiter(this, void 0, void 0, function* () {
-    const items = new pokenode_ts_1.ItemClient();
-    const species = (yield items.listItems(0, 10000)).results;
-    const data = yield Promise.all((species).map((species) => __awaiter(this, void 0, void 0, function* () {
-        try {
-            const response = yield items.getItemByName(species.name);
-            return {
-                id: response.id,
-                name: response.id,
-                image: response.sprites.default,
-                cost: response.cost,
-                category: response.category,
-                flingPower: response.fling_power,
-                flingEffect: response.fling_effect,
-                attributes: response.attributes
-            };
-        }
-        catch (err) {
-        }
-    })));
-    writeToFile(JSON.stringify(data), "items.json");
-});
-getPokemon();
-const writeToFile = (data, file) => {
-    fs.writeFile(file, data, (error) => {
-        if (error) {
-            throw error;
-        }
-        console.log("data.json written correctly");
-    });
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const app = express_1.default();
+app.use(body_parser_1.default.json());
+app.use(express_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+const request = require("cheerio");
+const cheerio = __importStar(require("cheerio"));
+const getFusion = () => {
+    request("https://infinitefusiondex.com/details/268.299", (error, response, html) => __awaiter(this, void 0, void 0, function* () {
+        if (!error && response.statusCode == 200) {
+            const $ = cheerio.load(html);
+            const stats = $("div.container-fluid");
+            console.log(stats.html);
+        }
+    }));
+};
+getFusion();
+app.get("fusion", () => (req, res) => {
+});
 //# sourceMappingURL=server.js.map

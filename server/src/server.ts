@@ -1,138 +1,62 @@
-import { write } from "fs";
-import { ItemClient, MoveClient, PokemonClient } from "pokenode-ts";
+import express from "express"
+import bodyParser from "body-parser"
+import cors from "cors"
 
-const fs = require("fs");
-const api = new PokemonClient();
 
-const getPokemon = async () => {
-    const pokemon = (await api.listPokemons(0, 151)).results
-    const data = await Promise.all(pokemon.map(async (p) => {
-        try {
-            const response = await api.getPokemonByName(p.name)
-            const stats = response.stats
+const app = express()
+app.use(bodyParser.json())
+app.use(express.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cors())
 
-            return {
-                name: response.name,
-                id: response.id,
-                type: response.types,
-                front: response.sprites.front_default,
-                back: response.sprites.back_default,
-                baseAttack: stats[1].base_stat,
-                baseDefence: stats[2].base_stat,
-                baseSpecialAttack: stats[3].base_stat,
-                baseSpecialDefence: stats[4].base_stat,
-                baseSpeed: stats[5].base_stat,
-                height: response.height,
-                moves: response.moves,
-            }
-        } catch (err) { console.log(err) }
-    }))
-    writeToFile(JSON.stringify(data), "pokemon.json")
-}
+const request = require("request")
+import * as cheerio from "cheerio"
 
-const getPokemonSpecies = async () => {
-    const species = (await api.listPokemonSpecies(0, 2000)).results
-    const data = await Promise.all((species).map(async (species) => {
-        try {
-            const response = await api.getPokemonSpeciesByName(species.name)
-            return {
-                id: response.id,
-                name: response.name,
-                generation: response.generation,
-                growthRate: response.growth_rate,
-                isMythical: response.is_mythical,
-                isLegendary: response.is_mythical,
-                isBaby: response.is_baby,
-                evolutionChain: response.evolution_chain,
-            }
-
-        } catch (err) {
-            console.log(err)
+app.get("/fusion", async (req, res) => {
+    const { id1, id2 } = req.query
+    request(`https://infinitefusiondex.com/details/${id1}.${id2}`, async (error: any, response: any, html: any) => {
+        if (!error && response.statusCode == 200) {
+            const stats = (getStats(html))
+            const image = getImage(html)
+            const types = getTypes(html)
+            const mon = { stats, image, types }
+            res.status(200).json(mon)
         }
-    }))
+    })
+})
 
-    writeToFile(JSON.stringify(data), "species.json")
+const getTypes = (html: any) => {
+    const $ = cheerio.load(html)
+    const type1 = $("img.elementalType").first().attr("alt")
+    const type2 = $("img.elementalType").first().next().attr("alt")
+    return [type1, type2].filter(e => e)
 }
 
-const getGrowthRates = async () => {
-    const species = (await api.listGrowthRates(0, 2000)).results
-    const data = await Promise.all((species).map(async (species) => {
-        try {
-            const response = await api.getGrowthRateByName(species.name)
-            return {
-                name: response.name,
-                id: response.id,
-                levels: response.levels
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }))
+const getImage = (html: any) => {
+    const $ = cheerio.load(html)
+    const image = $("img.sprite").first().attr("src")
+    return image;
 
-    writeToFile(JSON.stringify(data), "growthRates.json")
 }
 
-const getMoves = async () => {
-    const moveApi = new MoveClient()
-    const species = (await moveApi.listMoves(0, 10000)).results
-    const data = await Promise.all((species).map(async (species) => {
-        try {
-            const response = await moveApi.getMoveByName(species.name)
-            return {
-                name: response.name,
-                power: response.power,
-                pp: response.power,
-                accuracy: response.accuracy,
-                id: response.accuracy,
-                effectChange: response.effect_changes,
-                type: response.type,
-                statChanges: response.stat_changes,
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }))
+const getStats = (html: any) => {
+    const $ = cheerio.load(html)
+    const statContainer = $("div.container-fluid")
+    const statCol = $(statContainer).find("div.d-sm-block")
+    const stats = statCol.map((e, i) => {
+        return parseInt($(i).html().toString().substring(0, 2))
+    })
 
-    writeToFile(JSON.stringify(data), "moves.json")
+    return {
+        hp: stats[0],
+        attack: stats[1],
+        defence: stats[2],
+        specialAttack: stats[3],
+        specialDefence: stats[4],
+        speed: stats[5]
+    }
 }
 
-const getItems = async () => {
-    const items = new ItemClient();
-    const species = (await items.listItems(0, 10000)).results
-    const data = await Promise.all((species).map(async (species) => {
-        try {
-            const response = await items.getItemByName(species.name)
-            return {
-                id: response.id,
-                name: response.id,
-                image: response.sprites.default,
-                cost: response.cost,
-                category: response.category,
-                flingPower: response.fling_power,
-                flingEffect: response.fling_effect,
-                attributes: response.attributes
-            }
-        } catch (err) {
-        }
-    }))
-
-    writeToFile(JSON.stringify(data), "items.json")
-}
-
-getPokemon();
-//getPokemonSpecies()
-//getGrowthRates();
-//getMoves()
-//getItems();
-
-
-
-const writeToFile = (data: any, file: string) => {
-    fs.writeFile(file, data, (error) => {
-        if (error) {
-            throw error;
-        }
-        console.log("data.json written correctly");
-    });
-}
-
+app.listen(8080, () => {
+    console.log("server started at 8080")
+})

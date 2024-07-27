@@ -14,6 +14,7 @@ import Animated, { ZoomIn } from "react-native-reanimated";
 
 interface ShopUIProps {
     coins: number;
+    setCoins: React.Dispatch<React.SetStateAction<number>>
     pokemon: Pokemon
     setCurrentPokemon: React.Dispatch<React.SetStateAction<Pokemon>>
     updateText: (text: string) => void
@@ -25,7 +26,7 @@ interface ShopUIProps {
 
 
 export const ShopUI: React.FC<ShopUIProps> = ({ coins, pokemon, setCurrentPokemon,
-    updateText, team, setTeamIds, setMyItemIds, setTeam }) => {
+    updateText, team, setTeamIds, setMyItemIds, setTeam, setCoins }) => {
     const [selectedMenu, setSelectedMenu] = useState(null)
     const { data: items, isSuccess } = useQuery(["items"], getItemQuery)
 
@@ -51,9 +52,13 @@ export const ShopUI: React.FC<ShopUIProps> = ({ coins, pokemon, setCurrentPokemo
             </View>}
             {selectedMenu == "stats" && <StatsShop
                 pokemon={pokemon}
+                coins={coins}
+                setCoins={setCoins}
                 setCurrentPokemon={setCurrentPokemon} />}
             {selectedMenu == "moves" && <MoveShop
                 setTeam={setTeam}
+                setCoins={setCoins}
+                coins={coins}
                 setCurrentPokemon={setCurrentPokemon}
                 setSelectedMenu={setSelectedMenu}
                 team={team}
@@ -61,8 +66,11 @@ export const ShopUI: React.FC<ShopUIProps> = ({ coins, pokemon, setCurrentPokemo
             />}
 
             {selectedMenu == "pokemon" && <PokemonShop setSelectedMenu={setSelectedMenu}
+                setCoins={setCoins} coins={coins}
                 team={team} setTeamIds={setTeamIds} updateText={updateText} />}
-            {selectedMenu == "items" && <ItemShop items={items} setMyItemsIds={setMyItemIds} />}
+            {selectedMenu == "items" && <ItemShop
+                coins={coins} setCoins={setCoins}
+                items={items} setMyItemsIds={setMyItemIds} />}
         </Animated.View>
     )
 }

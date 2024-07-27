@@ -28,7 +28,7 @@ export const useGetTeam = (teamIds: number[], currentPokemonHealth: number) => {
             let pokemonToSwich = newTeam.filter(e => e && e.id == currentPokemon?.id)[0]
             pokemonToSwich = currentPokemon
             pokemonToSwich.currentHp = currentPokemonHealth
-            newTeam.push(newPokemon)
+            newTeam.push(newPokemon ?? newPokemon)
             setTeam(newTeam)
             setOldTeamIds(teamIds)
         }
@@ -42,7 +42,6 @@ export const useGetTeam = (teamIds: number[], currentPokemonHealth: number) => {
             pokemonToSwich.currentHp = health.value
             newTeam.push(pokemonToSwich)
             setTeam(newTeam.filter(e => e))
-            console.log(newTeam.length)
         }
 
 

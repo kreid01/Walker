@@ -1,14 +1,11 @@
 import * as SecureStore from 'expo-secure-store';
 
 export async function saveStarterPokemon(value) {
-  console.log(value)
   await SecureStore.setItemAsync("starterPokemon", value.toString());
 }
 
 export async function getStarterPokemon() {
-  var result = await SecureStore.getItemAsync("starterPokemon")
-  console.log(result)
-  return (result)
+  return await SecureStore.getItemAsync("starterPokemon")
 }
 
 export async function savePokemon(value) {
@@ -19,8 +16,9 @@ export async function savePokemon(value) {
   await SecureStore.setItemAsync("pokemon", newResult.toString());
 }
 
-export async function getPokemon() {
-  return await SecureStore.getItemAsync("pokemon")
+export async function getUserPokemon() {
+  const result = await SecureStore.getItemAsync("pokemon")
+  return (result)
 }
 
 export async function saveCoins(key, value) {
@@ -34,4 +32,35 @@ export async function saveCoins(key, value) {
 export async function getValueFor({ queryKey }: { queryKey: any }) {
   let result = await SecureStore.getItemAsync(queryKey[1]);
   return result
+}
+
+export const getLevel = async () => {
+  const result = await SecureStore.getItemAsync("level")
+  if (result == "" || Number.isNaN(result)) return 0
+  return parseFloat(result)
+}
+
+export const levelUser = async () => {
+  let result = parseInt(await SecureStore.getItemAsync("level"))
+  if (result == null || Number.isNaN(result)) result = 0
+  result += 1
+  await SecureStore.setItemAsync("level", result.toString())
+}
+
+export const resetLevel = async () => {
+  await SecureStore.setItemAsync("level", "")
+}
+
+export const resetXp = async () => {
+  await SecureStore.setItemAsync("xp", "")
+}
+
+export const getXp = async () => {
+  const result = parseInt(await SecureStore.getItemAsync("xp"))
+  if (result == null || Number.isNaN(result)) return 0;
+  return result
+}
+
+export const postXp = async (xp: number) => {
+  await SecureStore.setItemAsync("xp", xp.toString())
 }

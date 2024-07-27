@@ -1,0 +1,18 @@
+export const growthRate = [
+    { level: 0, xpRequired: 100 },
+    { level: 1, xpRequired: 500 },
+    { level: 2, xpRequired: 1000 },
+    { level: 3, xpRequired: 2000 },
+    { level: 4, xpRequired: 3000 },
+    { level: 5, xpRequired: 4000 },
+    { level: 6, xpRequired: 5000 },
+    { level: 7, xpRequired: 7500 },
+    { level: 8, xpRequired: 10000 },
+    { level: 9, xpRequired: 15000 },
+    { level: 10, xpRequired: 20000 },
+    { level: 11, xpRequired: 25000 },
+    { level: 12, xpRequired: 35000 },
+    { level: 13, xpRequired: 45000 },
+    { level: 14, xpRequired: 60000 },
+    { level: 15, xpRequired: 80000 },
+]

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useState } from "react";
 import { getTeamByIds, TeamPokemon } from "../../repositories/pokemonRepository";
 import { TouchableOpacity, View } from "react-native";
 import { FightUI } from "./FightUI";
@@ -28,11 +28,12 @@ interface BattleUIProps {
     setTeam: any
     setTeamIds: any
     health: any
+    setCoins: React.Dispatch<SetStateAction<number>>
 }
 
 
 export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updateText, team, setTeam, setTeamIds,
-    resettingText, lockUI, changePokemon, coins, setCurrentPokemon, navigation, health }) => {
+    resettingText, lockUI, changePokemon, coins, setCurrentPokemon, navigation, health, setCoins }) => {
     const [itemIds, setItemIds] = useState([])
     const [selectedMenu, setSelectedMenu] = useState(null)
 
@@ -61,6 +62,7 @@ export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updat
                 setSelectedMenu={setSelectedMenu} />}
             {selectedMenu == "bag" && <BagUI teamPokemon={team} itemIds={itemIds} />}
             {selectedMenu == "shop" && <ShopUI
+                setCoins={setCoins}
                 setTeamIds={setTeamIds}
                 pokemon={pokemon}
                 setTeam={setTeam}

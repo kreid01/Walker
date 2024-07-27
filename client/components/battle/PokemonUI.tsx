@@ -13,8 +13,6 @@ interface PokemonUIProps {
 }
 
 export const PokemonUI: React.FC<PokemonUIProps> = ({ team, changePokemon, setSelectedMenu, health, pokemon }) => {
-
-
     return (
         pokemon && team && <Animated.View entering={ZoomIn} className={`flex flex-row flex-wrap mx-2`}>
             {team.map((p, i) => {

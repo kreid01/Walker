@@ -5,6 +5,7 @@ export type IShopItem = {
     name: string;
     price: number;
     filterValue: string
+    levelRequired: number;
 }
 
 
@@ -12,7 +13,7 @@ export type Pokemon = {
     id: number;
     name: string;
     moves: IPokemonMove[]
-    type: string;
+    types: string[];
     growthRate: GrowthRateExperienceLevel[]
     front: string;
     back: string;
@@ -25,6 +26,7 @@ export type Pokemon = {
     speed: number;
     dexEntry: string;
     xp: number;
+    fusion: boolean
     level: number
     baseAttack: number,
     baseHp: number;
@@ -33,7 +35,13 @@ export type Pokemon = {
     baseSpecialDefence: number;
     baseSpeed: number
     height: number
-    currentMoves: IPokemonMove[]
+    currentMoves: IPokemonMove[];
+    attackLevel: number;
+    defenceLevel: number;
+    hpLevel: number;
+    specialAttackLevel: number;
+    specialDefenceLevel: number;
+    speedLevel: number;
 }
 
 

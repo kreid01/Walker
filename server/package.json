@@ -15,6 +15,7 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "start": "node ./dist/server.js",
+    "dev": "nodemon ./src/server.ts",
     "build": "npm run clean && tsc",
     "watch": "tsc --watch",
     "test": "mocha --opts tests/mocha.opts",
@@ -27,6 +28,7 @@
     "@types/chai": "^4.0.5",
     "@types/mocha": "^2.2.44",
     "@types/node": "^8.0.53",
+    "@types/request": "^2.48.12",
     "chai": "^4.1.2",
     "mocha": "^4.0.1",
     "ts-node": "^3.3.0",
@@ -37,8 +39,11 @@
     "node": ">=6.10"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
     "fs": "^0.0.1-security",
-    "pokenode-ts": "^1.20.0",
-    "react-native-svg": "^15.4.0"
+    "nodemon": "^3.1.4",
+    "request": "^2.88.2"
   }
 }

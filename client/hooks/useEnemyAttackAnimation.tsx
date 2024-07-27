@@ -6,20 +6,18 @@ export const useEnemyAttackAnimation = (currentPokemon: Pokemon, enemyPokemon: P
     : (text: string) => void, health1, checkAllFainted) => {
 
     const enemyAttack = () => {
-        const powerMoves = enemyPokemon.moves.filter(e => e.power > 1)
+        const powerMoves = enemyPokemon.moves
         const move = powerMoves[generateRandom(powerMoves.length)]
 
         updateText(enemyPokemon.name + " used " + move.name)
 
-        const damage = ((((2 * 1) / 5) + 2) * move.power * enemyPokemon.attack / currentPokemon.defence) / 50 + 2 * 10
+        const damage = ((((2 * 1) / 5) + 2) * move.power * enemyPokemon.attack / currentPokemon.defence) / 50 + 2
         health1.value = Math.round(health1.value - damage);
         setTimeout(enemyAttackAnimation, 1000)
         setTimeout(() => {
             if (checkAllFainted(health1.value)) {
                 return
             }
-            else { setTimeout(() => updateText("What will you do?"), 2000) }
-
         }, 3000)
 
     }
@@ -58,7 +56,9 @@ export const useEnemyAttackAnimation = (currentPokemon: Pokemon, enemyPokemon: P
 
     const widthAnimation = useSharedValue(0);
     const healthWidth = useAnimatedStyle(() => {
-        return { width: interpolate(widthAnimation.value, [0, 1], [81, 0]), scaleX: -1 }
+        return {
+            width: interpolate(widthAnimation.value, [0, 1], [81, 0]),
+        }
     })
 
     const startEnemyHpAnimation = () => {

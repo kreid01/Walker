@@ -9,17 +9,18 @@ import { MyText } from "../utils/MyText";
 import { LearnMove } from "./LearnMove";
 import { ShuffleAnimation } from "./SuffleAnimation";
 import { IPokemonMove, Pokemon } from "../../types/types";
-import { useQuery } from "react-query";
 
 interface MoveShopProps {
     setCurrentPokemon: React.Dispatch<React.SetStateAction<Pokemon>>
     updateText: (text: string) => void
-    team: TeamPokemon[]
+    team: Pokemon[]
     setSelectedMenu: React.Dispatch<React.SetStateAction<string>>
-    setTeam: React.Dispatch<React.SetStateAction<TeamPokemon[]>>
+    setTeam: React.Dispatch<React.SetStateAction<Pokemon[]>>
+    setCoins: React.Dispatch<React.SetStateAction<number>>
+    coins: number;
 }
 
-export const MoveShop: React.FC<MoveShopProps> = ({ setTeam,
+export const MoveShop: React.FC<MoveShopProps> = ({ setTeam, setCoins, coins,
     setCurrentPokemon, updateText, team, setSelectedMenu }) => {
     const [selectedPokemon, setSelectedPokemon] = useState(null)
     const [move, setMove] = useState<IPokemonMove>(null)
@@ -42,7 +43,7 @@ export const MoveShop: React.FC<MoveShopProps> = ({ setTeam,
 
     useEffect(() => {
         if (selectedPokemon) {
-            const pokemonMoves = selectedPokemon.currentMoves.map((m) => m.name)
+            const pokemonMoves = selectedPokemon.currentMoves.map((m) => m && m.name)
             setMoves(shuffle(duplidateData(selectedPokemon?.moves.filter(e => !pokemonMoves.includes(e.name)))))
         }
     }, [selectedPokemon, team])
@@ -56,9 +57,14 @@ export const MoveShop: React.FC<MoveShopProps> = ({ setTeam,
                         return (
                             <React.Fragment key={p.id}>
                                 <MyText style="text-white w-[20%] text-lg">{p?.name}</MyText>
-                                <TouchableOpacity onPress={() => setSelectedPokemon(p)}
+                                <TouchableOpacity onPress={() => {
+                                    if (coins > 50) {
+                                        setCoins((prevState) => prevState - 50)
+                                        setSelectedPokemon(p)
+                                    }
+                                }}
                                     className="border-white border-[1px] rounded-md mx-3">
-                                    <MyText style="text-white text-xl px-2">BUY MOVE</MyText>
+                                    <MyText style="text-white text-lg px-2">MOVE $50</MyText>
                                 </TouchableOpacity>
                             </React.Fragment>
                         )

@@ -18,7 +18,18 @@ export const getMyItems = async ({ queryKey }: { queryKey: any }) => {
         return await api.getItemById(id)
     }))
 
-    return items
+    const countedItems: any[] = []
+    items.map(e => {
+        if (countedItems && countedItems.some(i => i.name == e.name)) {
+            const item = countedItems.filter(i => i.name == e.name)[0]
+            item.count = item.count += 1
+        } else {
+            e.count = 1;
+            countedItems.push(e)
+        }
+    })
+
+    return countedItems
 }
 
 export type IItem = {

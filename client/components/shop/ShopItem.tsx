@@ -73,12 +73,17 @@ export const ShopItem: React.FC<ShopItemProps> = ({ item, buyDeck, pokemon }) =>
       image = fire
   }
 
+  const level = 1;
+
 
   return (
     <View className="flex flex-row bg-gray-100 my-2 h-64  mx-1 rounded-md border-purple-400 drop-shadow-xl border-2">
+      {level < item.levelRequired && <View className="absolute left-0 h-[250px] rounded-md w-28 bg-white opacity-75 z-20">
+        <MyText style="text-2xl mx-auto font-bold text-center mt-16">User level {item.levelRequired} required top buy</MyText>
+      </View>}
       <View className="flex flex-row justify-between w-[31%]">
         <View>
-          <Image source={image} className="h-48 w-28" />
+          <Image source={image} className="h-48 w-28 relative z-10" />
           <MyText style="text-black text-center text-xl ml-1">{item.name.toUpperCase()}</MyText>
           <View className="">
             <TouchableOpacity onPress={() => buyDeck(pokemon as any)} className="border-black border-[1px] mx-4 h-6 rounded-md ">

@@ -12,6 +12,8 @@ import { createStore } from "tinybase/store";
 import { useFonts } from "./hooks/useFonts";
 import { HomeScreen } from "./screens/Home";
 import { PokemonScreen } from "./screens/PokemonScreen";
+import { PokedexScreen } from "./screens/PokedexScreen";
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export const store = createStore()
   .setTablesSchema({
@@ -30,17 +32,20 @@ export default function App() {
   };
 
 
+
   LoadFonts();
 
   return (
-    <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
-        <StatusBar barStyle="light-content" translucent />
-        <NavigationContainer>
-          <MyTabs />
-        </NavigationContainer>
-      </QueryClientProvider>
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <StatusBar barStyle="light-content" translucent />
+          <NavigationContainer>
+            <MyTabs />
+          </NavigationContainer>
+        </QueryClientProvider>
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -60,9 +65,9 @@ function MyTabs() {
         component={HomeScreen}
       />
       <Tab.Screen
-        name="Inventory"
+        name="Pokedex"
         options={{ headerShown: false }}
-        component={Inventory}
+        component={PokedexScreen}
       />
       <Tab.Screen
         name="Pokemon"

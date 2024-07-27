@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react"
+import { Ref, useEffect, useRef, useState } from "react"
 import { View, Text, Image } from "react-native"
-import Animated, { FadeInUp, FadeOutDown, SharedValue, SlideInRight, SlideInUp } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutDown, runOnJS, SharedValue, SlideInRight, SlideInUp, useAnimatedReaction } from "react-native-reanimated";
 import { AnimatedText } from "../utils/AnimatedText";
 import hud from "../../sprites/hud/pokemon.png"
 import { MyText } from "../utils/MyText";
 import { Pokemon } from "../../types/types";
+import { getPokemonScale } from "../../utils/utils";
 
 interface UserPokemonProps {
   pokemon1: Pokemon;
@@ -20,23 +21,12 @@ interface UserPokemonProps {
 
 export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted,
   widthAnimation, pokemonAttack, healthWidth, flash }) => {
-  const xpNeeded = pokemon1?.growthRate?.filter(e => e.level == pokemon1.level)[0].experience
-  const [xpBar, setXpBar] = useState((pokemon1?.xp / xpNeeded) * 118)
+  const healthRef = useRef(null)
+  updateHealthColour(healthRef, widthAnimation)
 
-  const scale =
-    pokemon1.height > 50 ? pokemon1.height / 60 :
-      pokemon1.height > 20 ? pokemon1.height / 30 :
-        pokemon1.height > 18 ? pokemon1.height / 23 :
-          pokemon1.height > 10 ? pokemon1.height / 18 :
-            pokemon1.height > 5 ? pokemon1.height / 15 :
-              pokemon1.height <= 3 ? pokemon1.height / 7 :
-                pokemon1.height / 9
 
+  const scale = getPokemonScale(pokemon1.height)
   const top = 90
-
-  useEffect(() => {
-    setXpBar(((pokemon1?.xp / xpNeeded)) * 118)
-  }, [pokemon1])
 
   const uri = `https://img.pokemondb.net/sprites/black-white/anim/back-normal/${pokemon1.name.toLowerCase()}.gif`
 
@@ -44,8 +34,8 @@ export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted,
     <>
       <Animated.View entering={SlideInRight} className="relative right-[0%] top-[65%] pl-5 w-[50%]">
         <Image className="h-11 w-56 absolute left-[100%] top-[74%]" source={hud} />
-        <Animated.View style={healthWidth} className="h-[5.5px] z-30
-          bg-green-500 absolute -bottom-[13px] -right-[163px] rounded-md"></Animated.View>
+        <Animated.View ref={healthRef} style={healthWidth} className="h-[5.5px] z-30
+         absolute -bottom-[13px] left-[270px] rounded-md"></Animated.View>
         <MyText style="absolute left-[197%] text-xl -bottom-[14px]">{pokemon1?.level}</MyText>
         <MyText style="absolute -right-[90px] text-xl -bottom-[12px]">{pokemon1?.name}</MyText>
         <View className="absolute left-[290px] z-40 top-[15px]">
@@ -65,4 +55,24 @@ export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted,
       </Animated.View>}
     </>
   )
+}
+
+export const updateHealthColour = (healthRef: any, widthAnimation: SharedValue<number>) => {
+  const updateColour = (value: number) => {
+    const percent = 100 - (value * 100)
+
+    const colour = percent < 25 ? "rgb(239,68,68)" : percent < 50 ? "rgb(234,179,8)" : "rgb(34,197,94)"
+
+    if (!healthRef.current) return
+    healthRef.current.setNativeProps({ style: { backgroundColor: colour } })
+  }
+
+  useAnimatedReaction(() => {
+    return widthAnimation.value
+  }, (value) => {
+
+    if (updateColour)
+      runOnJS(updateColour)(value)
+
+  }, [updateColour, widthAnimation.value])
 }

@@ -1,8 +1,9 @@
 import { TouchableOpacity, View } from "react-native"
 import { MyText } from "../utils/MyText"
-import { IPokemonMove, Pokemon, TeamPokemon } from "../../repositories/pokemonRepository";
+import { TeamPokemon } from "../../repositories/pokemonRepository";
 import { useState } from "react";
 import { capitalizeFirstLetter } from "../../utils/utils";
+import { IPokemonMove } from "../../types/types";
 
 interface LearnMoveProps {
     setMove: any;
@@ -65,7 +66,7 @@ export const LearnMove: React.FC<LearnMoveProps> = ({ setMove, pokemon, move, se
                         <MyText style="text-xl text-white text-center mb-2">Current Moves</MyText>
                         {pokemon.currentMoves.map((move) => {
                             return (
-                                <TouchableOpacity onPress={() => forgetMove(move)}>
+                                <TouchableOpacity key={move.name} onPress={() => forgetMove(move)}>
                                     <MyText style="text-lg -mt-2 text-white">{move.name} - {move.power < 1 ? "status" : move.power}
                                     </MyText>
                                 </TouchableOpacity>)

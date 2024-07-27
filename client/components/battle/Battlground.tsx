@@ -3,6 +3,7 @@ import { EnemyPokemon } from "../pokemon/EnemyPokemon"
 import { UserPokemon } from "../pokemon/UserPokemon"
 import React, { useState } from "react"
 import { Pokemon } from "../../types/types"
+import { SharedValue } from "react-native-reanimated"
 
 interface BattleGroundProps {
     currentPokemon: Pokemon
@@ -16,10 +17,11 @@ interface BattleGroundProps {
     fainted: boolean;
     enemyFlash: any
     userFainted: boolean
+    widthAnimation: SharedValue<number>
 }
 
 export const BattleGround: React.FC<BattleGroundProps> = ({ currentPokemon, pokemonAttack, healthWidth, userWidthAnimation,
-    flash, width, enemyPokemon, enemyFlash, enemyPokemonAttack, fainted, userFainted
+    flash, width, enemyPokemon, enemyFlash, enemyPokemonAttack, fainted, userFainted, widthAnimation
 }) => {
     const [background, setBackground] = useState(require("../../sprites/backgrounds/image-5.png"))
 
@@ -40,6 +42,7 @@ export const BattleGround: React.FC<BattleGroundProps> = ({ currentPokemon, poke
                         attack={enemyPokemonAttack}
                         pokemon2={enemyPokemon}
                         fainted={fainted}
+                        widthAnimation={widthAnimation}
                         flashAnimation={enemyFlash} />}
                 </View>
             </View>

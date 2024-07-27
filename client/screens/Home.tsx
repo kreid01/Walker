@@ -2,9 +2,10 @@ import { ImageBackground, TouchableOpacity, View, Image } from "react-native"
 import { MyText } from "../components/utils/MyText"
 import { Navigation } from "../components/nav/Navigation"
 import { useQuery } from "react-query"
-import { getStarterPokemon } from "../utils/secureStorage"
+import { getStarterPokemon, resetLevel } from "../utils/secureStorage"
 import { useIsFocused } from "@react-navigation/native"
 import { useEffect } from "react"
+import axios from "axios"
 
 const pikachuUri = `https://img.pokemondb.net/sprites/black-white/anim/normal/pikachu.gif`
 const dialgaUri = `https://img.pokemondb.net/sprites/black-white/anim/normal/dialga.gif`
@@ -17,7 +18,6 @@ const mewUri = `https://img.pokemondb.net/sprites/black-white/anim/normal/mew.gi
 const bunnyUri = `https://img.pokemondb.net/sprites/black-white/anim/normal/buneary.gif`
 const lugiaUri = `https://img.pokemondb.net/sprites/black-white/anim/normal/lugia.gif`
 
-
 export const HomeScreen = ({ navigation }: { navigation: any }) => {
     const { data: starterPokemon, refetch } = useQuery('starterPokemon', getStarterPokemon)
 
@@ -25,9 +25,6 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
     useEffect(() => {
         refetch()
     }, [focused])
-
-
-    console.log(starterPokemon)
 
     return (
         <View className="h-[100vh] w-[100vw]">
@@ -43,10 +40,10 @@ export const HomeScreen = ({ navigation }: { navigation: any }) => {
             <Image className="w-20 h-40 ml-20 mt-20 z-2 absolute right-8 bottom-20" source={{ uri: bunnyUri }} />
             <Image className="w-24 h-16 ml-20 mt-20 z-2 absolute right-8 top-20" source={{ uri: lugiaUri }} />
             <View className=" justify-center mx-24 mt-auto mb-28">
-                <TouchableOpacity onPress={() => navigation.navigate("Fight", { starterPokemonId: starterPokemon })} className="border-white drop-shadow-lg border-2 my-2 rounded-md">
+                <TouchableOpacity onPress={() => navigation.navigate("Fight", { starterPokemonId: starterPokemon, fusion: false })} className="border-white drop-shadow-lg border-2 my-2 rounded-md">
                     <MyText style="mx-auto text-white text-3xl">Standard</MyText>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate("Fight")} className="border-white drop-shadow-lg border-2 my-2 rounded-md">
+                <TouchableOpacity onPress={() => navigation.navigate("Fight", { starterPokemonId: starterPokemon, fusion: true })} className="border-white drop-shadow-lg border-2 my-2 rounded-md">
                     <MyText style="mx-auto text-white text-3xl">Fusion</MyText>
                 </TouchableOpacity>
             </View>

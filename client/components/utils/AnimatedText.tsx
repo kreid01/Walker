@@ -1,7 +1,7 @@
 import { useRef } from "react"
 import { TextInput } from "react-native"
 import Animated, { runOnJS, SharedValue, useAnimatedReaction } from "react-native-reanimated"
-import { Pokemon } from "../../repositories/pokemonRepository";
+import { Pokemon } from "../../types/types";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 

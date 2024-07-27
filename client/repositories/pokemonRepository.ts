@@ -1,8 +1,8 @@
 import { PokemonClient, GameClient, MainClient, PokemonMove, GrowthRateExperienceLevel, MoveClient } from "pokenode-ts";
 import { getHpStat, getStat } from "../utils/pokemonStats";
-import { capitalizeFirstLetter } from "../utils/utils";
-import pokemonData from "../data/pokemon.json"
+import { capitalizeFirstLetter, generateRandom } from "../utils/utils";
 import { IPokemonMove, Pokemon } from "../types/types";
+import axios from "axios";
 
 export const getPokemonByIdQuery = async ({ queryKey }: { queryKey: any }) => {
   if (!queryKey[1]) return;
@@ -65,6 +65,74 @@ export type TeamPokemon = {
   currentMoves: IPokemonMove[]
 }
 
+type FusionPokemon = {
+  image: string;
+  stats: FusionStats;
+  types: string[]
+}
+
+type FusionStats = {
+  attack: number;
+  defence: number;
+  hp: number;
+  specialAttack: number;
+  specialDefence: number;
+  speed: number;
+}
+
+
+export const getFusionPokemonById = async ({ queryKey }: { queryKey: any }) => {
+  const api = new PokemonClient();
+  const id = queryKey[1]
+  const secondPokemonId = generateRandom(500, 0)
+  const params = { id1: id, id2: secondPokemonId }
+  const { data: fusion } = await axios.get<FusionPokemon>("http://localhost:8080/fusion", { params })
+  const response = await api.getPokemonById(id)
+  const response2 = await api.getPokemonById(secondPokemonId)
+  const moves = await getPokemonMoves(response.moves)
+  const moves2 = await getPokemonMoves(response2.moves)
+
+  const name1stHalf = response.name.substring(0, Math.floor(response.name.length / 2))
+  const name2ndHalf = response2.name.substring(Math.floor(response2.name.length / 2), response2.name.length)
+
+  const pokemon: Pokemon = {
+    fusion: true,
+    moves: moves,
+    id: response.id,
+    name: capitalizeFirstLetter(name1stHalf + name2ndHalf),
+    types: fusion.types,
+    front: fusion.image,
+    back: response.sprites.back_default,
+    growthRate: null,
+    dexEntry: null,
+    currentHp: getHpStat(fusion.stats.hp, 1),
+    hp: getHpStat(fusion.stats.hp, 1),
+    attack: getStat(fusion.stats.attack, 1),
+    defence: getStat(fusion.stats.defence, 1),
+    specialAttack: getStat(fusion.stats.specialAttack, 1),
+    specialDefence: getStat(fusion.stats.specialDefence, 1),
+    speed: getStat(fusion.stats.speed, 1),
+    baseHp: fusion.stats.hp,
+    baseAttack: fusion.stats.attack,
+    baseDefence: fusion.stats.defence,
+    baseSpecialAttack: fusion.stats.specialAttack,
+    baseSpecialDefence: fusion.stats.specialDefence,
+    baseSpeed: fusion.stats.speed,
+    level: 1,
+    xp: 0,
+    height: response.height,
+    currentMoves: [...moves, ...moves2].filter((e, i) => i < 3 && e.level < 5 && e.learnMethod == "level-up"),
+    attackLevel: 0,
+    defenceLevel: 0,
+    hpLevel: 0,
+    specialAttackLevel: 0,
+    specialDefenceLevel: 0,
+    speedLevel: 0
+  }
+
+  return pokemon
+}
+
 export const getPokemonById = async (id: number) => {
   const api = new PokemonClient();
   const response = await api.getPokemonById(id)
@@ -75,11 +143,13 @@ export const getPokemonById = async (id: number) => {
   //  const growth = (await api.getGrowthRateByName(growthRate.name)).levels
   const moves = await getPokemonMoves(response.moves)
 
+
   const pokemon: Pokemon = {
+    fusion: false,
     moves: moves,
     id: response.id,
     name: capitalizeFirstLetter(response.name),
-    type: response.types[0].type.name,
+    types: [response.types[0].type.name, response.types.length > 1 && response.types[1].type.name],
     front: response.sprites.front_default,
     back: response.sprites.back_default,
     growthRate: null,
@@ -100,7 +170,13 @@ export const getPokemonById = async (id: number) => {
     level: 1,
     xp: 0,
     height: response.height,
-    currentMoves: moves.filter((e, i) => i < 3 && e.level < 5 && e.learnMethod == "level-up")
+    currentMoves: moves.filter((e, i) => i < 3 && e.level < 5 && e.learnMethod == "level-up"),
+    attackLevel: 0,
+    defenceLevel: 0,
+    hpLevel: 0,
+    specialAttackLevel: 0,
+    specialDefenceLevel: 0,
+    speedLevel: 0
   }
 
 
@@ -159,14 +235,27 @@ export const getPokemonByName = async (name: string) => {
     const response = await api.getPokemonByName(name)
     const stats = response.stats
 
-    const pokemon = {
-      id: response.id, name: response.name, type: response.types[0].type.name, front: response.sprites.front_default,
-      back: response.sprites.back_default, hp: stats[0].base_stat, attack: stats[1].base_stat, defence: stats[2].base_stat,
-      specialAttack: stats[3].base_stat, specialDefence: stats[4].base_stat, speed: stats[5].base_stat
+    const pokemon: ShopPokemon = {
+      id: response.id, name: response.name, types: [response.types[0].type.name, response.types.length > 1 && response.types[1].type.name],
+      hp: stats[0].base_stat, attack: stats[1].base_stat, defence: stats[2].base_stat,
+      specialAttack: stats[3].base_stat, specialDefence: stats[4].base_stat, speed: stats[5].base_stat,
+
     }
 
     return pokemon
   }
+}
+
+type ShopPokemon = {
+  id: number;
+  name: string;
+  types: string[]
+  hp: number;
+  attack: number;
+  defence: number;
+  specialAttack: number;
+  specialDefence: number;
+  speed: number;
 }
 
 export const getPokemonEntry = async ({ queryKey }: { queryKey: any }) => {
@@ -200,3 +289,58 @@ const getPokemonByGeneration = async (id: number) => {
   })
   return await Promise.all(pokemon)
 }
+
+import { enablePromise, openDatabase, SQLiteDatabase } from 'react-native-sqlite-storage';
+
+const tableName = 'pokemon';
+
+enablePromise(true);
+
+export const getDBConnection = async () => {
+  return openDatabase({ name: 'pokemon.db', location: 'default' });
+};
+
+
+
+
+export const getPokemon = async (db: SQLiteDatabase): Promise<ShopPokemon[]> => {
+  try {
+    const pokemon: ShopPokemon[] = [];
+    const results = await db.executeSql(`SELECT rowid as id,value FROM ${tableName}`);
+    results.forEach(result => {
+      for (let index = 0; index < result.rows.length; index++) {
+        pokemon.push(result.rows.item(index))
+      }
+    });
+    return pokemon;
+  } catch (error) {
+    console.error(error);
+    throw Error('Failed to get Pokemon !!!');
+  }
+};
+
+export const createTable = async (db: SQLiteDatabase) => {
+  const query = `CREATE TABLE IF NOT EXISTS ${tableName}(
+        id TEXT NOT NULL
+        name TEXT NOT NULL
+        types TEXT NOT NULL
+        hp INT NOT NULL
+        attack INT NOT NULL
+        defence INT NOT NULL
+       specialAttack INT NOT NULL
+        specialDefence INT NOT NULL
+        speed INT NOT NULL
+    );`;
+
+  await db.executeSql(query);
+};
+
+export const savePokemon = async (db: SQLiteDatabase, pokemon: ShopPokemon[]) => {
+  console.log(db, pokemon.length)
+  const insertQuery =
+    `INSERT OR REPLACE INTO ${tableName}(id, name, types, hp, attack, defence, specialAttack, specialDefence, speed) values` +
+    pokemon.map(i => `(${i.id}, '${i.name}' '${i.types.join(',')}', ${i.hp}),
+    ${i.attack}, ${i.defence} ${i.specialAttack}, ${i.specialDefence}, ${i.speed}`).join(',');
+
+  return db.executeSql(insertQuery);
+};

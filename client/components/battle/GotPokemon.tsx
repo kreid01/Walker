@@ -3,12 +3,13 @@ import { MyText } from "../utils/MyText"
 import { TeamPokemon } from "../../repositories/pokemonRepository";
 import { useState } from "react";
 import { capitalizeFirstLetter } from "../../utils/utils";
+import { Pokemon } from "../../types/types";
 
 interface LearnMoveProps {
-    pokemon: TeamPokemon
+    pokemon: Pokemon
     setTeamIds: React.Dispatch<React.SetStateAction<number[]>>
     setSelectedPokemon: any
-    team: TeamPokemon[]
+    team: Pokemon[]
     updateText: (text: string) => void
     setSelectedMenu: any
 }
@@ -17,7 +18,7 @@ export const GotPokemon: React.FC<LearnMoveProps> = ({ team, pokemon, setTeamIds
     updateText, setSelectedMenu, setSelectedPokemon }) => {
     const [releasePokemon, setReleasePokemon] = useState(false)
 
-    const release = (releasedPokemon: TeamPokemon) => {
+    const release = (releasedPokemon: Pokemon) => {
         let newArray = team.map(e => e.id)
         newArray = team.filter(e => e.id != releasedPokemon.id).map(e => e.id)
         newArray.push(pokemon.id)
@@ -57,7 +58,13 @@ export const GotPokemon: React.FC<LearnMoveProps> = ({ team, pokemon, setTeamIds
                         <View className="border-[1px] border-white px-1 mt-3 rounded-sm">
                             <View className="flex flex-row">
                                 <MyText style="text-white text-lg">{capitalizeFirstLetter(pokemon.name)}</MyText>
-                                <MyText style="text-white text-lg ml-4"> {capitalizeFirstLetter(pokemon.type)}</MyText>
+                                <View className="flex flex-row">
+                                    {pokemon.types.map(type => {
+                                        return (
+                                            <MyText style="text-white text-lg ml-4"> {capitalizeFirstLetter(type)}</MyText>
+                                        )
+                                    })}
+                                </View>
                             </View>
                             <Image className="h-16 w-16" source={{ uri: pokemon.front }} />
                         </View>
