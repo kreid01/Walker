@@ -12,6 +12,7 @@ import { GestureEvent, GestureHandlerRootView, PanGestureHandler, PanGestureHand
 import { PokemonEntry } from "../components/shop/AnimatedDeckItem";
 import { Stats } from "../components/stats/Stats";
 import { SwipeGesture } from "react-native-swipe-gesture-handler";
+import { Checkbox } from "react-native-paper";
 
 
 const getPokemon = async () => {
@@ -43,6 +44,9 @@ export const PokedexScreen = ({ navigation }) => {
     const cardStyle = useAnimatedStyle((): any => {
         return { transform: [{ translateY: interpolate(translateX.value, [0, 40], [0, 100]) }] }
     })
+
+    const [shiny, setShiny] = useState(true)
+
 
     return (
         isSuccess &&
@@ -77,15 +81,19 @@ export const PokedexScreen = ({ navigation }) => {
                         <View className="h-[100%] w-[100%] bg-white absolute opacity-50 z-0" />
                         <PanGestureHandler onGestureEvent={panGestureHanlder}>
                             <View className="w-[100%] relative z-20 h-[100%] rounded-lg border-yellow-500 border-2">
-                                <MyText style="text-4xl text-center mt-1">{capitalizeFirstLetter(pokemon.name)}</MyText>
+                                <TouchableOpacity onPress={() => setShiny(isShiny => !isShiny)}
+                                    className=" absolute border-black z-10 border-[1px] h-8 w-8 ml-2 mt-1 bg-gray-200">
+                                    <MyText style="text-2xl mx-auto">{shiny ? "✔" : " "}</MyText>
+                                </TouchableOpacity>
+                                <MyText style="text-4xl text-center mt-1">{`${capitalizeFirstLetter(pokemon.name)} ${shiny ? "(shiny)" : ""}`}</MyText>
                                 <Image
                                     style={{ objectFit: "contain" }}
-                                    className="h-48 w-48 mx-auto mt-3"
-                                    source={{ uri: `https://projectpokemon.org/images/normal-sprite/${pokemon.name}.gif` }} />
-                                <View className="mb-6">
+                                    className="h-44 w-48 mx-auto mt-3"
+                                    source={{ uri: `https://projectpokemon.org/images/${shiny ? "shiny" : "normal"}-sprite/${pokemon.name}.gif` }} />
+                                <View className="mb-6 mt-4">
                                     <PokedexEntry name={pokemon.name} />
                                 </View>
-                                <View className="ml-2">
+                                <View className="ml-2 ">
                                     <Stats pokemon={pokemon} />
                                 </View>
                             </View>
@@ -106,11 +114,11 @@ export const PokedexEntry: React.FC<PokedexEntryProps> = ({ name }) => {
 
     return (
         isSuccess &&
-        <MyText style="text-xl w-[80vw] mx-auto text-center">{removeWhitespace(entry)}</MyText>
+        <MyText style="text-lg w-[80vw]  mx-auto text-center">{removeWhitespace(entry)}</MyText>
     )
 }
 
-function removeWhitespace(inputString) {
+export function removeWhitespace(inputString) {
     let trimmedString = inputString.trim();
     let cleanedString = trimmedString.replace(/\s+/g, ' ');
     return cleanedString;

@@ -18,10 +18,11 @@ interface BattleGroundProps {
     enemyFlash: any
     userFainted: boolean
     widthAnimation: SharedValue<number>
+    pokemonOutStyle: any
 }
 
 export const BattleGround: React.FC<BattleGroundProps> = ({ currentPokemon, pokemonAttack, healthWidth, userWidthAnimation,
-    flash, width, enemyPokemon, enemyFlash, enemyPokemonAttack, fainted, userFainted, widthAnimation
+    flash, width, enemyPokemon, enemyFlash, enemyPokemonAttack, fainted, userFainted, widthAnimation, pokemonOutStyle
 }) => {
     const [background, setBackground] = useState(require("../../sprites/backgrounds/image-5.png"))
 
@@ -36,6 +37,7 @@ export const BattleGround: React.FC<BattleGroundProps> = ({ currentPokemon, poke
                         pokemonAttack={pokemonAttack}
                         healthWidth={healthWidth}
                         widthAnimation={userWidthAnimation}
+                        pokemonOutStyle={pokemonOutStyle}
                         flash={flash}
                     />}
                     {enemyPokemon && <EnemyPokemon width={width}

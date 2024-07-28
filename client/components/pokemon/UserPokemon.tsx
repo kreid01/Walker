@@ -1,6 +1,6 @@
 import { Ref, useEffect, useRef, useState } from "react"
 import { View, Text, Image } from "react-native"
-import Animated, { FadeInUp, FadeOutDown, runOnJS, SharedValue, SlideInRight, SlideInUp, useAnimatedReaction } from "react-native-reanimated";
+import Animated, { FadeInUp, FadeOutDown, runOnJS, SharedValue, SlideInDown, SlideInRight, SlideInUp, useAnimatedReaction, ZoomIn } from "react-native-reanimated";
 import { AnimatedText } from "../utils/AnimatedText";
 import hud from "../../sprites/hud/pokemon.png"
 import { MyText } from "../utils/MyText";
@@ -16,10 +16,11 @@ interface UserPokemonProps {
     width: number;
   }
   fainted: boolean
+  pokemonOutStyle: any
 }
 
 
-export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted,
+export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted, pokemonOutStyle,
   widthAnimation, pokemonAttack, healthWidth, flash }) => {
   const healthRef = useRef(null)
   updateHealthColour(healthRef, widthAnimation)
@@ -43,16 +44,21 @@ export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted,
         </View>
         <MyText style="absolute left-[330px] text-white z-40 top-[15px]">{pokemon1?.hp}</MyText>
       </Animated.View>
-      {!fainted && <Animated.View exiting={FadeOutDown} entering={FadeInUp}>
-        <Animated.View className={"absolute left-0  top-14"} style={[pokemonAttack, flash]}>
-          <Animated.Image style={[{
-            transform: [{ scale: scale }],
-            top: top, aspectRatio: 1,
-            height: undefined, width: 180,
-            objectFit: 'contain'
-          }]} source={{ uri: uri }} />
-        </Animated.View>
-      </Animated.View>}
+      {!fainted &&
+        <>
+          <Animated.View style={pokemonOutStyle}>
+            <Animated.View entering={SlideInDown} exiting={FadeOutDown}>
+              <Animated.View className={"absolute left-0  top-14"} style={[pokemonAttack, flash]}>
+                <Animated.Image style={[{
+                  transform: [{ scale: scale }],
+                  top: top, aspectRatio: 1,
+                  height: undefined, width: 180,
+                  objectFit: 'contain'
+                }]} source={{ uri: uri }} />
+              </Animated.View>
+            </Animated.View>
+          </Animated.View>
+        </>}
     </>
   )
 }

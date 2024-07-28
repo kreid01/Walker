@@ -29,7 +29,7 @@ export const ShuffleItem: React.FC<ShuffleItemProps> = ({ item, contentOffset })
 
     return (
         <Animated.View style={style} className="border-white  h-8 shadow-md my-1 border-[1px]">
-            <View className={`border-${getBackgroundColour(item.item.type)}-500 border-[2px]`}>
+            <View className={`border-${getBackgroundColour(item.item.type ? item.item.type : item.item.types[0])}-500 border-[2px]`}>
                 <MyText style=" text-center text-white text-xl">{item.item.name}</MyText>
             </View>
         </Animated.View>)

@@ -35,7 +35,7 @@ export const useAttackAnimation = (pokemon1, pokemon2, updateText, setPokemon, h
     }
 
     const updateEnemyHp = (move: IPokemonMove) => {
-        const damage = (((((2 * 1) / 5) + 2) * move.power * pokemon1.attack / pokemon2.defence) / 50 + 2) * 10
+        const damage = (((((2 * 1) / 5) + 2) * move.power * pokemon1.attack / pokemon2.defence) / 50 + 2)
         health2.value = Math.round(health2.value - damage)
     }
 

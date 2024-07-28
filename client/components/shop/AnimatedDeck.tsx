@@ -31,11 +31,9 @@ export const AnimatedDeck: React.FC<AnimatedDeckProps> = ({ data, navigation }) 
     if (rendered && data) {
       setTimeout(() => scrollToIndex(), 400)
     }
-
-
   }, [rendered, data])
 
-  setTimeout(() => setLoaded(true), 2300)
+  setTimeout(() => setLoaded(true), 2500)
   const scrollToIndex = () => flatList?.current?.scrollToIndex({ index: Math.round(data.length / 2) })
 
   return (

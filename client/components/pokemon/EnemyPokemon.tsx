@@ -23,17 +23,17 @@ export const EnemyPokemon: React.FC<EnemyPokemonProps> = ({ attack, pokemon2, wi
 
   const healthRef = useRef()
   updateHealthColour(healthRef, widthAnimation)
-  const uri = pokemon2.fusion ? pokemon2.front : `https://img.pokemondb.net/sprites/black-white/anim/normal/${pokemon2.name.toLowerCase()}.gif`
+  const uri = pokemon2.fusion ? pokemon2.front : `https://img.pokemondb.net/sprites/black-white/anim/${pokemon2.shiny ? "shiny" : "false"}/${pokemon2.name.toLowerCase()}.gif`
 
   const height = pokemon2.height;
   const top =
-    pokemon2.fusion && height == 65 ? 40
+    pokemon2.fusion && height > 60 ? 40
       : pokemon2.fusion ? 70 : (height == 17 ? 55 :
         height == 7 ? 50 :
           height == 6 ? 60 :
-            height == 5 ? 35 :
+            height == 5 ? 55 :
               height > 12 ? 40
-                : height > 9 ? 45 : 70)
+                : height > 9 ? 45 : 60)
 
   return (
     <>

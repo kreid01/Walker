@@ -3,6 +3,7 @@ import { getHpStat, getStat } from "../utils/pokemonStats";
 import { capitalizeFirstLetter, generateRandom } from "../utils/utils";
 import { IPokemonMove, Pokemon } from "../types/types";
 import axios from "axios";
+import { getPokemonCache, storePokemonCache } from "../utils/secureStorage";
 
 export const getPokemonByIdQuery = async ({ queryKey }: { queryKey: any }) => {
   if (!queryKey[1]) return;
@@ -127,7 +128,8 @@ export const getFusionPokemonById = async ({ queryKey }: { queryKey: any }) => {
     hpLevel: 0,
     specialAttackLevel: 0,
     specialDefenceLevel: 0,
-    speedLevel: 0
+    speedLevel: 0,
+    shiny: false,
   }
 
   return pokemon
@@ -142,7 +144,6 @@ export const getPokemonById = async (id: number) => {
   //const growthRate = species.growth_rate
   //  const growth = (await api.getGrowthRateByName(growthRate.name)).levels
   const moves = await getPokemonMoves(response.moves)
-
 
   const pokemon: Pokemon = {
     fusion: false,
@@ -170,13 +171,14 @@ export const getPokemonById = async (id: number) => {
     level: 1,
     xp: 0,
     height: response.height,
-    currentMoves: moves.filter((e, i) => i < 3 && e.level < 5 && e.learnMethod == "level-up"),
+    currentMoves: moves.filter((e, i) => e.level < 5 && e.learnMethod == "level-up").filter((m, i) => i < 3),
     attackLevel: 0,
     defenceLevel: 0,
     hpLevel: 0,
     specialAttackLevel: 0,
     specialDefenceLevel: 0,
-    speedLevel: 0
+    speedLevel: 0,
+    shiny: false,
   }
 
 
@@ -186,21 +188,18 @@ export const getPokemonById = async (id: number) => {
 
 const getPokemonMoves = async (moves: PokemonMove[]): Promise<IPokemonMove[]> => {
   const moveClient = new MoveClient()
-  const movesArr = await Promise.all((moves).filter(e =>
-    e.version_group_details[0].level_learned_at < 5
-    && e.version_group_details[0].move_learn_method.name == "level-up")
-    .map(async (move, i): Promise<IPokemonMove> => {
-      const moveObject = await moveClient.getMoveByName(move.move.name)
-      return {
-        name: move.move.name,
-        level: move.version_group_details[0].level_learned_at,
-        accuracy: moveObject.accuracy,
-        power: moveObject.power,
-        pp: moveObject.pp,
-        type: moveObject.type.name,
-        learnMethod: move.version_group_details[0].move_learn_method.name
-      }
-    }))
+  const movesArr = await Promise.all(moves.map(async (move, i): Promise<IPokemonMove> => {
+    const moveObject = await moveClient.getMoveByName(move.move.name)
+    return {
+      name: move.move.name,
+      level: move.version_group_details[0].level_learned_at,
+      accuracy: moveObject.accuracy,
+      power: moveObject.power,
+      pp: moveObject.pp,
+      type: moveObject.type.name,
+      learnMethod: move.version_group_details[0].move_learn_method.name
+    }
+  }))
 
   return movesArr;
 }
@@ -246,7 +245,7 @@ export const getPokemonByName = async (name: string) => {
   }
 }
 
-type ShopPokemon = {
+export type ShopPokemon = {
   id: number;
   name: string;
   types: string[]
@@ -276,8 +275,24 @@ export const getMyPokemon = async ({ queryKey }: { queryKey: any }) => {
 }
 
 export const getPokemonByType = async ({ queryKey }: { queryKey: any }) => {
-  const pokemon = await getPokemonByGeneration(1)
-  return pokemon.filter(e => e.type == queryKey[1])
+  const pokemon = await getGen5Pokemon(queryKey[1])
+  return pokemon.filter(e => e.types.some(t => t == queryKey[1]))
+}
+
+export const getGen5Pokemon = async (type: string) => {
+  const api = new PokemonClient();
+  const data = (await api.listPokemons(0, 649)).results
+  const pokemon = await Promise.all(data.map(async p => {
+    const cachedPokemon = await getPokemonCache(p.name)
+    if (cachedPokemon) return cachedPokemon
+    else {
+      const calledPokemon = await getPokemonByName(p.name)
+      await storePokemonCache(calledPokemon)
+      return cachedPokemon;
+    }
+  }))
+
+  return pokemon.filter(e => e.types.some(t => t == type))
 }
 
 
@@ -285,62 +300,14 @@ const getPokemonByGeneration = async (id: number) => {
   const data = await new GameClient().getGenerationById(id)
   const pokemon: any[] = []
   data.pokemon_species.map(async p => {
-    pokemon.push(getPokemonByName(p.name))
+    const cachedPokemon = await getPokemonCache(p.name)
+    if (cachedPokemon) return cachedPokemon
+    else {
+      const calledPokemon = await getPokemonByName(p.name)
+      await storePokemonCache(calledPokemon)
+      return cachedPokemon;
+    }
   })
   return await Promise.all(pokemon)
 }
 
-import { enablePromise, openDatabase, SQLiteDatabase } from 'react-native-sqlite-storage';
-
-const tableName = 'pokemon';
-
-enablePromise(true);
-
-export const getDBConnection = async () => {
-  return openDatabase({ name: 'pokemon.db', location: 'default' });
-};
-
-
-
-
-export const getPokemon = async (db: SQLiteDatabase): Promise<ShopPokemon[]> => {
-  try {
-    const pokemon: ShopPokemon[] = [];
-    const results = await db.executeSql(`SELECT rowid as id,value FROM ${tableName}`);
-    results.forEach(result => {
-      for (let index = 0; index < result.rows.length; index++) {
-        pokemon.push(result.rows.item(index))
-      }
-    });
-    return pokemon;
-  } catch (error) {
-    console.error(error);
-    throw Error('Failed to get Pokemon !!!');
-  }
-};
-
-export const createTable = async (db: SQLiteDatabase) => {
-  const query = `CREATE TABLE IF NOT EXISTS ${tableName}(
-        id TEXT NOT NULL
-        name TEXT NOT NULL
-        types TEXT NOT NULL
-        hp INT NOT NULL
-        attack INT NOT NULL
-        defence INT NOT NULL
-       specialAttack INT NOT NULL
-        specialDefence INT NOT NULL
-        speed INT NOT NULL
-    );`;
-
-  await db.executeSql(query);
-};
-
-export const savePokemon = async (db: SQLiteDatabase, pokemon: ShopPokemon[]) => {
-  console.log(db, pokemon.length)
-  const insertQuery =
-    `INSERT OR REPLACE INTO ${tableName}(id, name, types, hp, attack, defence, specialAttack, specialDefence, speed) values` +
-    pokemon.map(i => `(${i.id}, '${i.name}' '${i.types.join(',')}', ${i.hp}),
-    ${i.attack}, ${i.defence} ${i.specialAttack}, ${i.specialDefence}, ${i.speed}`).join(',');
-
-  return db.executeSql(insertQuery);
-};

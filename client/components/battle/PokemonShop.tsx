@@ -28,7 +28,9 @@ export const PokemonShop: React.FC<PokemonShopProps> = ({ setSelectedMenu, team,
     const [selectedPokemon, setSelectPokemon] = useState(null)
 
     useEffect(() => {
-        if (data) setDuplicatedData(duplidateData(data))
+        if (data) {
+            setDuplicatedData(duplidateData(data))
+        }
     }, [data, isSuccess])
 
     const updatePokemon = (pokemon: Pokemon) => {
@@ -48,7 +50,7 @@ export const PokemonShop: React.FC<PokemonShopProps> = ({ setSelectedMenu, team,
                 {shopItems.map(item => {
                     return (
                         <TouchableOpacity key={item} onPress={() => {
-                            if (coins > 100) {
+                            if (coins > 100 || true) {
                                 setCoins((prevState) => prevState - 100)
                                 setSelectedType(item)
                             }

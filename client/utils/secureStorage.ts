@@ -1,4 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
+import { ShopPokemon } from '../repositories/pokemonRepository';
 
 export async function saveStarterPokemon(value) {
   await SecureStore.setItemAsync("starterPokemon", value.toString());
@@ -63,4 +64,13 @@ export const getXp = async () => {
 
 export const postXp = async (xp: number) => {
   await SecureStore.setItemAsync("xp", xp.toString())
+}
+
+export const storePokemonCache = async (pokemon: ShopPokemon) => {
+  await SecureStore.setItemAsync(pokemon.name, JSON.stringify(pokemon))
+}
+
+export const getPokemonCache = async (pokemonName: string) => {
+  const result = await SecureStore.getItemAsync(pokemonName)
+  return JSON.parse(result)
 }

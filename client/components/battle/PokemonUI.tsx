@@ -15,9 +15,10 @@ interface PokemonUIProps {
 export const PokemonUI: React.FC<PokemonUIProps> = ({ team, changePokemon, setSelectedMenu, health, pokemon }) => {
     return (
         pokemon && team && <Animated.View entering={ZoomIn} className={`flex flex-row flex-wrap mx-2`}>
-            {team.map((p, i) => {
+            {team.filter(p => p).map((p, i) => {
                 const hpWidth = (p?.id == pokemon?.id ? health.value : p?.currentHp) / p?.hp * 82.5
                 const isFaintedBg = p?.currentHp > 0 ? "" : "bg-red-500"
+                const hp = (p?.id == pokemon?.id ? health.value : p?.currentHp)
                 return (
                     <TouchableOpacity
                         key={p?.name} onPress={() => {
@@ -32,7 +33,7 @@ export const PokemonUI: React.FC<PokemonUIProps> = ({ team, changePokemon, setSe
                             <View style={{ width: hpWidth > 0 ? hpWidth : 1 }}
                                 className=" absolute top-6 rounded-md ml-1 bg-green-500 h-2"></View>
                         </View>
-                        <MyText style="text-white ml-2 mt-5">{p?.id == pokemon?.id ? health.value : p?.currentHp} / {p?.hp}</MyText>
+                        <MyText style="text-white ml-2 mt-5">{hp < 0 ? 0 : hp}/ {p?.hp}</MyText>
                         <Image className="ml-auto h-10 w-10 object-fit" source={{ uri: p?.front }} />
                     </TouchableOpacity>
                 )

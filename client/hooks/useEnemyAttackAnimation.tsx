@@ -11,7 +11,8 @@ export const useEnemyAttackAnimation = (currentPokemon: Pokemon, enemyPokemon: P
 
         updateText(enemyPokemon.name + " used " + move.name)
 
-        const damage = ((((2 * 1) / 5) + 2) * move.power * enemyPokemon.attack / currentPokemon.defence) / 50 + 2
+        if (move.power == 0) return;
+        const damage = (((((2 * 1) / 5) + 2) * move.power * enemyPokemon.attack / currentPokemon.defence) / 50 + 2)
         health1.value = Math.round(health1.value - damage);
         setTimeout(enemyAttackAnimation, 1000)
         setTimeout(() => {

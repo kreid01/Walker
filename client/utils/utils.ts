@@ -27,7 +27,6 @@ export const duplidateData = (data: any[]) => {
 }
 
 export const getPokemonScale = (height: number) => {
-  console.log(height)
 
   return height == 92 ? height / 110 :
     height == 45 ? height / 47 :
@@ -35,24 +34,26 @@ export const getPokemonScale = (height: number) => {
         height == 42 ? height / 45 :
           height == 40 ? height / 45 :
             height == 37 ? height / 40 :
-              height == 32 ? height / 38 :
-                height == 17 ? height / 25 :
-                  height == 16 ? height / 24 :
-                    height == 15 ? height / 22 :
-                      height == 14 ? height / 20 :
-                        height == 13 ? height / 18 :
-                          height == 12 ? height / 18 :
-                            height == 11 ? height / 18 :
-                              height == 10 ? height / 17 :
-                                height == 9 ? height / 16 :
-                                  height == 8 ? height / 15 :
-                                    height == 7 ? height / 12 :
-                                      height == 6 ? height / 10 :
-                                        height == 5 ? height / 8 :
-                                          height == 4 ? height / 8 :
-                                            height == 3 ? height / 7 :
-                                              height == 2 ? height / 5 :
-                                                height > 50 ? height / 60 :
-                                                  height > 20 ? height / 28
-                                                    : height / 25
+              height == 35 ? height / 39 :
+                height == 32 ? height / 38 :
+                  height == 20 ? height / 30 :
+                    height == 17 ? height / 20 :
+                      height == 16 ? height / 24 :
+                        height == 15 ? height / 22 :
+                          height == 14 ? height / 20 :
+                            height == 13 ? height / 18 :
+                              height == 12 ? height / 20 :
+                                height == 11 ? height / 18 :
+                                  height == 10 ? height / 17 :
+                                    height == 9 ? height / 16 :
+                                      height == 8 ? height / 15 :
+                                        height == 7 ? height / 12 :
+                                          height == 6 ? height / 10 :
+                                            height == 5 ? height / 9 :
+                                              height == 4 ? height / 8 :
+                                                height == 3 ? height / 7 :
+                                                  height == 2 ? height / 5 :
+                                                    height > 50 ? height / 60 :
+                                                      height > 20 ? height / 28
+                                                        : height / 25
 }

@@ -8,18 +8,25 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useQuery } from 'react-query';
 import { ShopItem } from '../components/shop/ShopItem';
 import { PokemonClient } from 'pokenode-ts';
-import { createTable, getDBConnection, getPokemon, getPokemonByName, savePokemon } from '../repositories/pokemonRepository';
+import { getPokemonByName } from '../repositories/pokemonRepository';
 import { duplidateData } from '../utils/utils';
 import loading from "../assets/loading.gif"
 import bg from "../assets/shopbg.png"
 import { MyText } from '../components/utils/MyText';
+import { getPokemonCache, storePokemonCache } from '../utils/secureStorage';
 
 const getPokemonByGeneration = async () => {
 
   const api = new PokemonClient();
-  const pokemon = (await api.listPokemons(387, 100)).results
-  const result = await Promise.all(pokemon.map(p => {
-    return getPokemonByName(p.name)
+  const pokemon = (await api.listPokemons(0, 800)).results
+  const result = await Promise.all(pokemon.map(async p => {
+    const cachedPokemon = await getPokemonCache(p.name)
+    if (cachedPokemon) return cachedPokemon
+    else {
+      const calledPokemon = await getPokemonByName(p.name)
+      await storePokemonCache(calledPokemon)
+      return cachedPokemon;
+    }
   }))
 
   return result

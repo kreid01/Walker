@@ -76,7 +76,7 @@ export const PokemonScreen = ({ navigation }) => {
                                 </View>
                                 {isSuccessPokemon && pokemon &&
                                     <View className="flex flex-row">
-                                        {pokemon?.types.map(type => {
+                                        {pokemon?.types.filter(t => t).map(type => {
                                             return (
                                                 <View key={type} className={`border-2 mx-1 px-2 rounded-sm border-${getBackgroundColour(type)}-500`}>
                                                     <MyText style="text-black text-l">{type}</MyText>

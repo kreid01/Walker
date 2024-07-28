@@ -58,7 +58,7 @@ export const MoveShop: React.FC<MoveShopProps> = ({ setTeam, setCoins, coins,
                             <React.Fragment key={p.id}>
                                 <MyText style="text-white w-[20%] text-lg">{p?.name}</MyText>
                                 <TouchableOpacity onPress={() => {
-                                    if (coins > 50) {
+                                    if (coins >= 50) {
                                         setCoins((prevState) => prevState - 50)
                                         setSelectedPokemon(p)
                                     }

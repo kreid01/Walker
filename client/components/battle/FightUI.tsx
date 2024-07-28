@@ -23,7 +23,7 @@ export const FightUI: React.FC<FightUIProps> = ({ pokemon, attack, setSelectedMe
                         <View style={{ backgroundColor: getBackgroundColour(move.type) }} className="h-[97%]  mx-[4px] 
                         border-white my-2 border-2 rounded-sm">
                             <View className="flex flex-row">
-                                <MyText style="mr-auto ml-2 text-xl my-auto text-white">{move.name.toUpperCase()}</MyText>
+                                <MyText style="mr-auto ml-2 text-md my-auto text-white">{move.name.toUpperCase()}</MyText>
                                 <View className={`border-2 mr-2 px-2 h-6 mt-1 rounded-sm border-${getBackgroundColour(move.type)}-500`}>
                                     <MyText style=" text-lg -mt-1 text-white">{move.type}</MyText>
                                 </View>

@@ -1,8 +1,8 @@
-import { default as Reanimted, Extrapolate, FadeOutDown, interpolate, LightSpeedInRight, SharedValue, useAnimatedStyle, FadeInRight, ZoomIn, SlideInRight, SlideInLeft } from "react-native-reanimated"
+import { default as Reanimted, Extrapolate, FadeOutDown, interpolate, LightSpeedInRight, SharedValue, useAnimatedStyle, FadeInRight, ZoomIn, SlideInRight, SlideInLeft, useSharedValue, RollOutRight, RollOutLeft, LightSpeedOutLeft, LightSpeedOutRight, BounceOutRight } from "react-native-reanimated"
 import { Pressable, Animated, View, Image, ImageBackground } from "react-native"
 import { MyText } from "../utils/MyText"
-import { useRef } from "react"
-import { capitalizeFirstLetter } from "../../utils/utils"
+import { useRef, useState } from "react"
+import { capitalizeFirstLetter, generateRandom } from "../../utils/utils"
 import React from "react"
 import { Stats } from "../stats/Stats"
 import { useQuery } from "react-query"
@@ -22,6 +22,7 @@ interface AnimatedDeckItemProps {
 
 import pokecard from "../../assets/poke.png"
 import grassbg from "../../assets/grassbg.jpg"
+import { removeWhitespace } from "../../screens/PokedexScreen"
 
 export const AnimatedDeckItem: React.FC<AnimatedDeckItemProps> = ({ pokemon, index, contentOffset, flatList, setCardSelected, cardSelected, navigation }) => {
   const carouselWidth = 35
@@ -61,6 +62,27 @@ export const AnimatedDeckItem: React.FC<AnimatedDeckItemProps> = ({ pokemon, ind
 
     return value;
   })
+
+  const value = useSharedValue(0)
+  const startStyle = useAnimatedStyle((): any => {
+    return {
+      transform: [
+        {
+          translateY: interpolate(value.value, inputRange, translateYOutputRange),
+        },
+        {
+          translateX: parseInt(interpolate(value.value, inputRange, translateXOutputRange, Extrapolate.CLAMP).toFixed(0)),
+        },
+        {
+          rotate: `${interpolate(value.value, inputRange, rotationOutputRange)}deg`
+        }
+      ]
+    }
+
+  })
+
+
+
 
   const cardAnimation = useRef(new Animated.Value(0));
   const imageFront = useRef(new Animated.Value(0))
@@ -130,12 +152,13 @@ export const AnimatedDeckItem: React.FC<AnimatedDeckItemProps> = ({ pokemon, ind
     setTimeout(() => navigation.navigate("Home"), 6000)
   }
 
-  const uri = `https://img.pokemondb.net/sprites/black-white/anim/normal/${pokemon?.name.toLowerCase()}.gif`
+  const [shiny] = useState(generateRandom(4096) == 2044)
+  const uri = `https://img.pokemondb.net/sprites/black-white/anim/${shiny ? "shiny" : "normal"}/${pokemon?.name.toLowerCase()}.gif`
 
   return (
     <Reanimted.View className="rounded-lg relative w-[35px] h-[112px]" style={[{ aspectRatio: 1, }, rStyle]}>
       {(cardSelected == null || cardSelected == index) &&
-        <Reanimted.View entering={LightSpeedInRight.delay(50 * index).duration(300)} exiting={FadeOutDown}>
+        <Reanimted.View entering={LightSpeedInRight.delay(50 * index).duration(300)} exiting={FadeOutDown.delay(index * 30)}>
           <Pressable onPress={() => startAnimation()}>
 
             <Animated.View style={transofrm as any}
@@ -196,8 +219,8 @@ export const PokemonEntry: React.FC<PokemonEntryProps> = ({ name }) => {
 
   return (
     isSuccess &&
-    <Reanimted.View className="w-80 -ml-24 mt-14" entering={SlideInLeft.delay(500).duration(1000)}>
-      <MyText style="text-xl text-white">{entry}</MyText>
+    <Reanimted.View className="w-80 -ml-28 mt-14" entering={SlideInLeft.delay(500).duration(1000)}>
+      <MyText style="text-xl text-white">{removeWhitespace(entry)}</MyText>
     </Reanimted.View>
   )
 }
