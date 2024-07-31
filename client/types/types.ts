@@ -10,6 +10,7 @@ export type IShopItem = {
 
 
 export type Pokemon = {
+    shiny: boolean
     id: number;
     name: string;
     moves: IPokemonMove[]

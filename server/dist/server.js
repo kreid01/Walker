@@ -20,22 +20,54 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const cors_1 = __importDefault(require("cors"));
 const app = express_1.default();
 app.use(body_parser_1.default.json());
 app.use(express_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-const request = require("cheerio");
+app.use(cors_1.default());
+const request = require("request");
 const cheerio = __importStar(require("cheerio"));
-const getFusion = () => {
-    request("https://infinitefusiondex.com/details/268.299", (error, response, html) => __awaiter(this, void 0, void 0, function* () {
+app.get("/fusion", (req, res) => __awaiter(this, void 0, void 0, function* () {
+    const { id1, id2 } = req.query;
+    request(`https://infinitefusiondex.com/details/${id1}.${id2}`, (error, response, html) => __awaiter(this, void 0, void 0, function* () {
         if (!error && response.statusCode == 200) {
-            const $ = cheerio.load(html);
-            const stats = $("div.container-fluid");
-            console.log(stats.html);
+            const stats = (getStats(html));
+            const image = getImage(html);
+            const types = getTypes(html);
+            const mon = { stats, image, types };
+            res.status(200).json(mon);
         }
     }));
+}));
+const getTypes = (html) => {
+    const $ = cheerio.load(html);
+    const type1 = $("img.elementalType").first().attr("alt");
+    const type2 = $("img.elementalType").first().next().attr("alt");
+    return [type1, type2].filter(e => e);
 };
-getFusion();
-app.get("fusion", () => (req, res) => {
+const getImage = (html) => {
+    const $ = cheerio.load(html);
+    const image = $("img.sprite").first().attr("src");
+    return image;
+};
+const getStats = (html) => {
+    const $ = cheerio.load(html);
+    const statContainer = $("div.container-fluid");
+    const statCol = $(statContainer).find("div.d-sm-block");
+    const stats = statCol.map((e, i) => {
+        return parseInt($(i).html().toString().substring(0, 2));
+    });
+    return {
+        hp: stats[0],
+        attack: stats[1],
+        defence: stats[2],
+        specialAttack: stats[3],
+        specialDefence: stats[4],
+        speed: stats[5]
+    };
+};
+app.listen(8080, () => {
+    console.log("server started at 8080");
 });
 //# sourceMappingURL=server.js.map

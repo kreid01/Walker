@@ -86,7 +86,8 @@ export const ShopItem: React.FC<ShopItemProps> = ({ item, buyDeck, pokemon }) =>
           <Image source={image} className="h-48 w-28 relative z-10" />
           <MyText style="text-black text-center text-xl ml-1">{item.name.toUpperCase()}</MyText>
           <View className="">
-            <TouchableOpacity onPress={() => buyDeck(pokemon as any)} className="border-black border-[1px] mx-4 h-6 rounded-md ">
+            <TouchableOpacity onPress={() =>
+               buyDeck(pokemon as any)} className="border-black border-[1px] mx-4 h-6 rounded-md ">
               <MyText style="text-lg mx-auto -mt-1">Buy ${item.price}</MyText>
             </TouchableOpacity>
           </View>

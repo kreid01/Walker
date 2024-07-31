@@ -1,4 +1,4 @@
-import { Pokemon } from "../repositories/pokemonRepository"
+import { Pokemon } from "../types/types"
 
 export const getPokemonStats = (pokemon: Pokemon, xp: number, level: number): Pokemon => {
     return ({
