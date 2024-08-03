@@ -51,7 +51,7 @@ export const PokemonScreen = ({ navigation }) => {
 
     return (
         isSuccess &&
-        < View>
+        < View className="pt-8">
             <View className="flex flex-row">
                 <TouchableOpacity onPress={() => navigation.navigate("Home")}><MyText style="text-black text-xl ml-4 mr-10 mt-5">{"<"}</MyText></TouchableOpacity>
                 <MyText style="text-center text-black text-3xl mt-4 ml-3">Starter Pokemon</MyText>

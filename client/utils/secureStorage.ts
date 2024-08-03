@@ -37,13 +37,19 @@ export async function getValueFor({ queryKey }: { queryKey: any }) {
 
 export const getLevel = async () => {
   const result = await SecureStore.getItemAsync("level")
-  if (result == "" || Number.isNaN(result)) return 0
+  console.log(result)
+  if (result == "" || !result) {
+    return 0
+  }
   return parseFloat(result)
 }
 
 export const levelUser = async () => {
   let result = parseInt(await SecureStore.getItemAsync("level"))
-  if (result == null || Number.isNaN(result)) result = 0
+  if (result == null || Number.isNaN(result)) {
+    await SecureStore.setItemAsync("level", (0).toString())
+    result = 0
+  }
   result += 1
   await SecureStore.setItemAsync("level", result.toString())
 }
@@ -58,7 +64,10 @@ export const resetXp = async () => {
 
 export const getXp = async () => {
   const result = parseInt(await SecureStore.getItemAsync("xp"))
-  if (result == null || Number.isNaN(result)) return 0;
+  if (result == null || Number.isNaN(result)) {
+    postXp(0)
+    return 0;
+  }
   return result
 }
 

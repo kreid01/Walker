@@ -38,7 +38,7 @@ export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updat
     const [selectedMenu, setSelectedMenu] = useState(null)
 
     return (
-        <View className="w-[100%] fixed  top-8  bg-slate-500 -mt-24  border-2 border-yellow-500 h-[39.5%] py-2" pointerEvents={lockUI ? "none" : "auto"}>
+        <View className="w-[100%] fixed  top-8  bg-slate-500 -mt-28  border-2 border-yellow-500 h-[49vh] -m py-2" pointerEvents={lockUI ? "none" : "auto"}>
             <View className="bg-white w-[95%]  h-16 border-yellow-300 border-2 rounded-md mr-1 ml-2">
                 {!resettingText && <Typing color={"black"} textSize={22} text={text} />}
             </View>
@@ -75,7 +75,7 @@ export const BattleUI: React.FC<BattleUIProps> = ({ pokemon, attack, text, updat
             {(selectedMenu != null || selectedMenu == "run") &&
                 <View className="mt-auto relative w-14 z-10">
                     <TouchableOpacity onPress={() => setSelectedMenu(null)}
-                        className="border-[1px] ml-2 r -mb-1 border-white w-14 rounded-sm">
+                        className="border-[1px] ml-2 mb-8 border-white w-14 rounded-sm">
                         <MyText style="px-2 mx-auto text-white text-xl">{"Back"}</MyText>
                     </TouchableOpacity>
                 </View>}

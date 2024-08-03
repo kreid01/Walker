@@ -50,7 +50,7 @@ export const PokedexScreen = ({ navigation }) => {
 
     return (
         isSuccess &&
-        <View>
+        <View className="pt-10">
             <View className="flex flex-row">
                 <TouchableOpacity onPress={() => navigation.navigate("Home")}>
                     <MyText style="text-black text-xl ml-4 mr-10 mt-5">{"<"}</MyText></TouchableOpacity>

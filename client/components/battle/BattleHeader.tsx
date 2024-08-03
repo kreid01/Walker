@@ -12,8 +12,8 @@ interface BattleHeaderProps {
 
 export const BattleHeader: React.FC<BattleHeaderProps> = ({ coins, round, xpBarAnimation, level }) => {
     return (
-        <View className="  bg-slate-500  pt-5 border-2 h-[20vh] border-yellow-500">
-            <View className="flex flex-row">
+        <View className="  bg-slate-500  mt-0 border-2 h-[20vh] border-yellow-500">
+            <View className="flex flex-row mt-12">
                 <MyText style="text-xl mt-5 text-white mx-auto">Coins: {coins}</MyText>
                 <MyText style="text-xl mt-5 text-white mx-auto">Level: {level}</MyText>
                 <MyText style="text-xl my-5 text-white mx-auto">Round: {round}</MyText>

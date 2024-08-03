@@ -27,6 +27,7 @@ export const duplidateData = (data: any[]) => {
 }
 
 export const getPokemonScale = (height: number) => {
+  console.log(height)
 
   return height == 92 ? height / 110 :
     height == 45 ? height / 47 :

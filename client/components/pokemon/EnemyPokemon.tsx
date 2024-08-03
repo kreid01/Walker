@@ -23,7 +23,7 @@ export const EnemyPokemon: React.FC<EnemyPokemonProps> = ({ attack, pokemon2, wi
 
   const healthRef = useRef()
   updateHealthColour(healthRef, widthAnimation)
-  const uri = pokemon2.fusion ? pokemon2.front : `https://img.pokemondb.net/sprites/black-white/anim/${pokemon2.shiny ? "shiny" : "false"}/${pokemon2.name.toLowerCase()}.gif`
+  const uri = pokemon2.fusion ? pokemon2.front : `https://img.pokemondb.net/sprites/black-white/anim/${pokemon2.shiny ? "shiny" : "normal"}/${pokemon2.name.toLowerCase()}.gif`
 
   const height = pokemon2.height;
   const top =
@@ -39,7 +39,7 @@ export const EnemyPokemon: React.FC<EnemyPokemonProps> = ({ attack, pokemon2, wi
     <>
       <Animated.View entering={SlideInLeft} className="relative top-[10%] left-[65%]">
         <Image className="h-10 w-56 absolute  right-[120%] top-[45%]" source={hud} />
-        <Animated.View ref={healthRef} style={[width]} className={`h-[4px] w-10 bg-green-500  absolute -left-[57.2%] top-[20.7px] rounded-md`} />
+        <Animated.View ref={healthRef} style={[width]} className={`h-[4px] w-10 bg-green-500  absolute -left-[55.3%] top-[20.7px] rounded-md`} />
         <MyText style="w-[120px]  right-[131%] -top-1 absolute text-xl">{pokemon2?.name}</MyText>
         <MyText style="w-[120px]  right-[102%] -top-[2px] absolute text-xl">{pokemon2?.level}</MyText>
       </Animated.View>

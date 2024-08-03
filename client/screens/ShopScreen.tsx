@@ -66,7 +66,7 @@ export const ShopScreen = ({ navigation }) => {
   return (
     isSuccess ? (
       <ImageBackground source={bg} className='h-[100%] w-[100%]'>
-        {!startBuying && <Animated.View style={animatedStyles} className="flex flex-row bg-transparent mt-4  justify-between">
+        {!startBuying && <Animated.View style={animatedStyles} className="flex flex-row bg-transparent mt-4 pt-10 justify-between">
           <TouchableOpacity onPress={() => navigation.navigate("Home")}><MyText style="text-black text-xl ml-4 mr-10 mt-2">{"<"}</MyText></TouchableOpacity>
           <View><MyText style='ml-24 text-4xl text-center'>Shop</MyText></View>
           <MyText style="ml-auto mt-2  mr-5 text-2xl">$30</MyText>

@@ -33,16 +33,16 @@ export const UserPokemon: React.FC<UserPokemonProps> = ({ pokemon1, fainted, pok
 
   return (
     <>
-      <Animated.View entering={SlideInRight} className="relative right-[0%] top-[65%] pl-5 w-[50%]">
+      <Animated.View entering={SlideInRight} className="relative right-[-2%] top-[65%] pl-5 w-[50%]">
         <Image className="h-11 w-56 absolute left-[100%] top-[74%]" source={hud} />
         <Animated.View ref={healthRef} style={healthWidth} className="h-[5.5px] z-30
-         absolute -bottom-[13px] left-[270px] rounded-md"></Animated.View>
+         absolute -bottom-[13px] left-[280px] rounded-md"></Animated.View>
         <MyText style="absolute left-[197%] text-xl -bottom-[14px]">{pokemon1?.level}</MyText>
-        <MyText style="absolute -right-[90px] text-xl -bottom-[12px]">{pokemon1?.name}</MyText>
-        <View className="absolute left-[290px] z-40 top-[15px]">
+        <MyText style="absolute -right-[70px] text-xl -bottom-[12px]">{pokemon1?.name}</MyText>
+        <View className="absolute left-[310px] z-40 top-[15px]">
           <AnimatedText pokemon={pokemon1} sharedValue={widthAnimation} />
         </View>
-        <MyText style="absolute left-[330px] text-white z-40 top-[15px]">{pokemon1?.hp}</MyText>
+        <MyText style="absolute left-[335px] text-white z-40 top-[15px]">{pokemon1?.hp}</MyText>
       </Animated.View>
       {!fainted &&
         <>

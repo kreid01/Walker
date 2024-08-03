@@ -276,13 +276,11 @@ export const Fight: React.FC<FightProps> = ({ navigation, starterPokemonId, fusi
 
     return (
         <>
-            <View className="absolute bottom-80 z-50 left-0 ">
-                <TouchableOpacity onPress={() => startAnimation()}>
-                    <Animated.Image style={ballThrowStyle} source={masterball} className="h-8 w-8" />
-                </TouchableOpacity>
+            <View className="absolute bottom-[465px] z-50 left-0 ">
+                <Animated.Image style={ballThrowStyle} source={masterball} className="h-8 w-8" />
             </View>
             <View className="h-[100vh] relative">
-                {showIntro && <Animated.Image exiting={FadeOut} source={gif} className="h-[268px] top-[135px] w-[375px] l z-20 absolute" />}
+                {showIntro && <Animated.Image exiting={FadeOut} source={gif} className="h-[270px] top-[170px] w-[100vw] l z-20 absolute" />}
                 <BattleHeader level={level} coins={coins} round={round} xpBarAnimation={xpBarAnimation} />
                 <BattleGround
                     pokemonOutStyle={pokemonOutStyle}
